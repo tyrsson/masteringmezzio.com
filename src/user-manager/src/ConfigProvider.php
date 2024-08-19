@@ -48,6 +48,7 @@ final class ConfigProvider
                 ],
             ],
             'factories'  => [
+                Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
                 Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
                 Handler\RegistrationHandler::class   => Handler\RegistrationHandlerFactory::class,
