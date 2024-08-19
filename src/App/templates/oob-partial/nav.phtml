@@ -1,0 +1,68 @@
+<nav id="nav" hx-swap-oob="true">
+    <!-- Brand -->
+    <ul>
+        <li>
+            <a href="<?=$this->url('home')?>">
+                <img src="https://docs.laminas.dev/img/laminas-mezzio-rgb.svg" alt="Mastering Mezzio" width="300" />
+            </a>
+        </li>
+    </ul>
+    <!-- Links -->
+    <ul>
+        <li>
+            <a href="https://docs.mezzio.dev/mezzio" target="_blank">
+                <i class="fa fa-book"></i> Docs
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/mezzio/mezzio" target="_blank">
+                <i class="fa fa-wrench"></i> Contribute
+            </a>
+        </li>
+        <li>
+            <a href="<?=$this->url('api.ping')?>">
+                Ping Test
+            </a>
+        </li>
+        <?php
+        if ($this->user->getDetail('role_id') === 'Administrator'):
+        ?>
+        <li>
+            <a href="<?=$this->url('admin')?>">
+                Admin
+            </a>
+        </li>
+        <?php
+        endif;
+        ?>
+        <?php
+        if ($this->user->getIdentity() === 'guest'):
+        ?>
+        <li>
+            <a href="<?=$this->url('um.login')?>">
+                Sign In
+            </a>
+        </li>
+        <li>
+            <a href="<?=$this->url('um.register')?>">
+                Register
+            </a>
+        </li>
+        <?php
+        else:
+        ?>
+        <li>
+            <a href="<?=$this->url('um.account')?>">
+                Account
+            </a>
+        </li>
+        <li>
+            <a href="<?=$this->url('um.logout')?>">
+                Sign Out
+            </a>
+        </li>
+        <?php
+        endif;
+        ?>
+    </ul>
+</nav>
