@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+$this->headTitle(ucfirst($this->currentRoute));
+?>
+<article>
+<?php
+    if (isset($this->form)) {
+        $this->form->setAttribute('action', $this->url('um.login'));
+        echo $this->form($this->form);
+    }
+?>
+</article>
