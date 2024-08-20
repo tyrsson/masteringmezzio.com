@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
-use Laminas\Filter;
-use Laminas\Validator;
-use Mezzio\Authentication\AuthenticationInterface;
-use Mezzio\Authentication\Session\PhpSession;
-use Mezzio\Authentication\UserRepositoryInterface;
+use Fig\Http\Message\RequestMethodInterface as Http;
+use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 /**
  * The configuration provider for the App module
@@ -26,11 +24,9 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'authentication' => ['redirect' => '/admin'],
             'dependencies'       => $this->getDependencies(),
             'templates'          => $this->getTemplates(),
-            // 'view_helper_config' => $this->getViewHelperConfig(),
-            // 'view_manager'       => $this->getViewManagerConfig(), // framework factory is outdated
+            'routes'             => $this->getRoutes(),
         ];
     }
 
@@ -52,6 +48,38 @@ class ConfigProvider
         ];
     }
 
+    public function getRoutes(): array
+    {
+        return [
+            [
+                'path' => '/',
+                'name' => 'home',
+                'middleware' => [
+                    Handler\HomePageHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET],
+            ],
+            [
+                'path' => '/admin',
+                'name' => 'admin.dashboard',
+                'middleware' => [
+                    AuthorizationMiddleware::class,
+                    BodyParamsMiddleware::class,
+                    Handler\DashboardHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET],
+            ],
+            [
+                'path' => '/api/ping',
+                'name' => 'api.ping',
+                'middleware' => [
+                    Handler\PingHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET],
+            ],
+        ];
+    }
+
     /**
      * Returns the templates configuration
      */
@@ -59,27 +87,12 @@ class ConfigProvider
     {
         return [
             'paths' => [
-                'app'          => [__DIR__ . '/../templates/app'],
-                'error'        => [__DIR__ . '/../templates/error'],
-                'layout'       => [__DIR__ . '/../templates/layout'],
-                'app-endpoint' => [__DIR__ . '/../templates/api-endpoint'],
+                'app'              => [__DIR__ . '/../templates/app'],
+                'error'            => [__DIR__ . '/../templates/error'],
+                'layout'           => [__DIR__ . '/../templates/layout'],
+                'app-endpoint'     => [__DIR__ . '/../templates/api-endpoint'],
                 'app-oob-partial'  => [__DIR__ . '/../templates/oob-partial'],
             ],
-        ];
-    }
-
-    public function getViewHelperConfig(): array
-    {
-        return [
-            'doctype' => 'HTML5',
-            'body_class' => 'layout-fixed sidebar-expand-lg bg-body-tertiary',
-        ];
-    }
-
-    public function getViewManagerConfig(): array
-    {
-        return [
-            'base_path' => '/',
         ];
     }
 }

@@ -70,4 +70,9 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
             );
         }
     }
+
+    public function getTable(): string
+    {
+        return $this->gateway->getTable();
+    }
 }

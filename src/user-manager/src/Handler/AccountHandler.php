@@ -25,13 +25,12 @@ class AccountHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-
         // Render and return a response:
         return new HtmlResponse($this->renderer->render(
             'user-manager::account',
             [
                 'swapNav' => $request->getAttribute(HtmxHeader::HX_Trigger->value, false) === 'login-form',
-            ] // parameters to pass to template
+            ]
         ));
     }
 }

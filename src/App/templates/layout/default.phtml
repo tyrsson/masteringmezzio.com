@@ -96,12 +96,12 @@ $this->headScript()
                     if ($this->user->getIdentity() === 'guest'):
                     ?>
                     <li>
-                        <a href="<?=$this->url('um.login')?>">
+                        <a href="<?=$this->url('user-manager.login')?>">
                             Sign In
                         </a>
                     </li>
                     <li>
-                        <a href="<?=$this->url('um.register')?>">
+                        <a href="<?=$this->url('user-manager.register')?>">
                             Register
                         </a>
                     </li>
@@ -109,12 +109,12 @@ $this->headScript()
                     else:
                     ?>
                     <li>
-                        <a href="<?=$this->url('um.account')?>">
+                        <a href="<?=$this->url('user-manager.account')?>">
                             Account
                         </a>
                     </li>
                     <li>
-                        <a href="<?=$this->url('um.logout')?>">
+                        <a href="<?=$this->url('user-manager.logout')?>">
                             Sign Out
                         </a>
                     </li>

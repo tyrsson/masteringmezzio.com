@@ -41,17 +41,4 @@ use Psr\Container\ContainerInterface;
  */
 
 return static function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
-    $app->get('/', App\Handler\HomePageHandler::class, 'home'); // load custom layout for this handler
-    $app->route(
-        '/admin',
-        [
-            AuthenticationMiddleware::class,
-            BodyParamsMiddleware::class,
-            App\Handler\DashboardHandler::class,
-        ],
-        null,
-        'admin'
-    );
-
-    $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
 };

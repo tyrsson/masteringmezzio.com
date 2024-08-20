@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace UserManager\Form;
+
+use Htmx\HtmxAttributes as Htmx;
+use Htmx\Form\HtmxTrait;
+use Laminas\Form;
+use UserManager\Form\Fieldset\AcctDataFieldset;
+
+class Register extends Form\Form
+{
+    public function init(): void
+    {
+        $this->add(
+            [
+                'name' => 'acct-data',
+                'type' => AcctDataFieldset::class,
+                'options' => [
+                    'use_as_base_fieldset' => true,
+                ],
+            ]
+        );
+
+        $this->add([
+            'name' => 'Register',
+            'type' => Form\Element\Submit::class,
+            'attributes' => [
+                'value' => 'Register',
+            ],
+        ]);
+    }
+}

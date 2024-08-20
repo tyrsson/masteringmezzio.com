@@ -54,10 +54,12 @@
         "laminas/laminas-stdlib": "^3.6",
         "mezzio/mezzio": "^3.7",
         "mezzio/mezzio-authentication-session": "^1.9",
+        "mezzio/mezzio-authorization-rbac": "^1.7",
         "mezzio/mezzio-fastroute": "^3.11.0",
         "mezzio/mezzio-helpers": "^5.7",
         "mezzio/mezzio-laminasviewrenderer": "^2.15",
-        "mezzio/mezzio-session-ext": "^1.19"
+        "mezzio/mezzio-session-ext": "^1.19",
+        "webinertia/webinertia-filter": "^0.0.5"
     },
     "require-dev": {
         "axleus/axleus-dev-tools": "1.0.x-dev",

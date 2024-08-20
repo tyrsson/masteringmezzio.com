@@ -11,6 +11,9 @@ use Mezzio\Authentication\AuthenticationInterface;
 use Mezzio\Authentication\AuthenticationMiddleware;
 use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Authorization\AuthorizationInterface;
+use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Authorization\Rbac\LaminasRbac;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider
@@ -18,20 +21,47 @@ final class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'authentication' => $this->getAuthenticationConfig(),
-            'dependencies'   => $this->getDependencies(),
-            'form_elements'  => $this->getFormElementConfig(),
-            'routes'         => $this->getRouteConfig(),
-            'templates'      => $this->getTemplates(),
+            'authentication'            => $this->getAuthenticationConfig(),
+            'dependencies'              => $this->getDependencies(),
+            'form_elements'             => $this->getFormElementConfig(),
+            'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
+            'routes'                    => $this->getRouteConfig(),
+            'templates'                 => $this->getTemplates(),
         ];
     }
 
     public function getAuthenticationConfig(): array
     {
         return [
-            'redirect' => '/um/account', // redirect for authentication component post login
+            'redirect' => '/user-manager/account', // redirect for authentication component post login
             'username' => 'email',
             'password' => 'password',
+        ];
+    }
+
+    public function getAuthorizationConfig(): array
+    {
+        return [
+            'roles'       => [
+                'Administrator' => [],
+                //'Editor'        => ['Administrator'],
+                //'Contributor'   => ['Editor'],
+                'User'          => ['Administrator'],
+                'Guest'         => ['User'],
+            ],
+            'permissions' => [
+                'Guest' => [
+                    'user-manager.login',
+                    'user-manager.register',
+                ],
+                'User'  => [
+                    'user-manager.logout',
+                    'user-manager.account',
+                ],
+                'Administrator' => [
+                    'admin.dashboard',
+                ],
+            ],
         ];
     }
 
@@ -40,6 +70,7 @@ final class ConfigProvider
         return [
             'aliases' => [
                 AuthenticationInterface::class => PhpSession::class,
+                AuthorizationInterface::class  => LaminasRbac::class,
                 UserRepositoryInterface::class => UserRepository\TableGateway::class,
             ],
             'delegators' => [
@@ -73,39 +104,40 @@ final class ConfigProvider
     {
         return [
             [
-                'path'       => '/um/login',
-                'name'       => 'um.login', // todo: update name to use um prefix
+                'path'       => '/user-manager/login',
+                'name'       => 'user-manager.login', // todo: update name to use um prefix
                 'middleware' => [
+                    AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
                     Handler\LoginHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST]
             ],
             [
-                'path'       => '/um/logout',
-                'name'       => 'um.logout',
+                'path'       => '/user-manager/logout',
+                'name'       => 'user-manager.logout',
                 'middleware' => [
+                    AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
-                    AuthenticationMiddleware::class,
                     Handler\LogoutHandler::class,
                 ],
             ],
             [
-                'path'        => '/um/register',
-                'name'        => 'um.register',
-                'middleware' => [
+                'path'        => '/user-manager/register',
+                'name'        => 'user-manager.register',
+                'middleware'  => [
                     BodyParamsMiddleware::class,
-                    AuthenticationMiddleware::class,
+                    AuthorizationMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/um/account',
-                'name'        => 'um.account',
-                'middleware' => [
+                'path'        => '/user-manager/account',
+                'name'        => 'user-manager.account',
+                'middleware'  => [
                     BodyParamsMiddleware::class,
-                    AuthenticationMiddleware::class,
+                    AuthorizationMiddleware::class,
                     Handler\AccountHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
