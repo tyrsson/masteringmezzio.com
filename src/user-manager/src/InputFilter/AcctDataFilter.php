@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\Filter;
+namespace UserManager\InputFilter;
 
 use Laminas\Db\Adapter\AdapterAwareInterface;
 use Laminas\Db\Adapter\AdapterAwareTrait;

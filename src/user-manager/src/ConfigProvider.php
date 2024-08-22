@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
-use Mezzio\Authentication\AuthenticationMiddleware;
 use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
-use Mezzio\Authorization\Rbac\LaminasRbac;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider
@@ -23,6 +22,7 @@ final class ConfigProvider
         return [
             'authentication'            => $this->getAuthenticationConfig(),
             'dependencies'              => $this->getDependencies(),
+            'filters'                   => $this->getFilters(),
             'form_elements'             => $this->getFormElementConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
@@ -51,6 +51,7 @@ final class ConfigProvider
             ],
             'permissions' => [
                 'Guest' => [
+                    'home.read',
                     'user-manager.login',
                     'user-manager.register',
                 ],
@@ -59,7 +60,7 @@ final class ConfigProvider
                     'user-manager.account',
                 ],
                 'Administrator' => [
-                    'admin.dashboard',
+                    'admin.dashboard.read',
                 ],
             ],
         ];
@@ -70,7 +71,7 @@ final class ConfigProvider
         return [
             'aliases' => [
                 AuthenticationInterface::class => PhpSession::class,
-                AuthorizationInterface::class  => LaminasRbac::class,
+                AuthorizationInterface::class  => Authz\Rbac::class,
                 UserRepositoryInterface::class => UserRepository\TableGateway::class,
             ],
             'delegators' => [
@@ -79,6 +80,7 @@ final class ConfigProvider
                 ],
             ],
             'factories'  => [
+                Authz\Rbac::class                    => Authz\RbacFactory::class,
                 Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
                 Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
@@ -87,6 +89,15 @@ final class ConfigProvider
                 Handler\VerifyAccountHandler::class  => Handler\VerifyAccountHandlerFactory::class,
                 Middleware\IdentityMiddleware::class => Middleware\IdentityMiddlewareFactory::class,
                 UserRepository\TableGateway::class   => UserRepository\TableGatewayFactory::class,
+            ],
+        ];
+    }
+
+    public function getFilters(): array
+    {
+        return [
+            'factories' => [
+                Filter\HttpMethodToRbacPermissionFilter::class => InvokableFactory::class,
             ],
         ];
     }
@@ -107,7 +118,7 @@ final class ConfigProvider
                 'path'       => '/user-manager/login',
                 'name'       => 'user-manager.login', // todo: update name to use um prefix
                 'middleware' => [
-                    AuthorizationMiddleware::class,
+                    //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
                     Handler\LoginHandler::class,
                 ],
@@ -117,7 +128,7 @@ final class ConfigProvider
                 'path'       => '/user-manager/logout',
                 'name'       => 'user-manager.logout',
                 'middleware' => [
-                    AuthorizationMiddleware::class,
+                    //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
                     Handler\LogoutHandler::class,
                 ],
@@ -127,7 +138,7 @@ final class ConfigProvider
                 'name'        => 'user-manager.register',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    AuthorizationMiddleware::class,
+                    //AuthorizationMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],

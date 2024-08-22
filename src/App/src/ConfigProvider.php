@@ -63,7 +63,7 @@ class ConfigProvider
                 'path' => '/admin',
                 'name' => 'admin.dashboard',
                 'middleware' => [
-                    AuthorizationMiddleware::class,
+                    //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
                     Handler\DashboardHandler::class,
                 ],

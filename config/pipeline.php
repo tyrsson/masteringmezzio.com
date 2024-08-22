@@ -9,6 +9,7 @@ use App\Middleware\TemplateMiddleware;
 use Htmx\Middleware\HtmxMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Application;
+use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Handler\NotFoundHandler;
 use Mezzio\Helper\ServerUrlMiddleware;
 use Mezzio\Helper\UrlHelperMiddleware;
@@ -73,6 +74,9 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
 
     // Seed the UrlHelper with the routing results:
     $app->pipe(UrlHelperMiddleware::class);
+
+    // pipe this here so we can have the Identity, RouteResult
+    $app->pipe(AuthorizationMiddleware::class);
 
     // Add more middleware here that needs to introspect the routing results; this
     // might include:
