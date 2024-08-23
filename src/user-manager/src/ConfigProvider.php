@@ -52,8 +52,8 @@ final class ConfigProvider
             'permissions' => [
                 'Guest' => [
                     'home.read',
-                    'user-manager.login',
-                    'user-manager.register',
+                    'user-manager.login.read',
+                    'user-manager.register.read',
                 ],
                 'User'  => [
                     'user-manager.logout',
