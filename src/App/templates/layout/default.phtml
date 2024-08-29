@@ -11,13 +11,13 @@ $this->headMeta()
 $this->headLink(
     [
         'rel'  => 'shortcut icon',
-        'href' => 'https://getlaminas.org/images/favicon/favicon.ico',
+        'href' => $this->basePath('front-end/images/mm16.png'),
     ]
 );
 
 // styles
 $this->headLink()
-    ->appendStylesheet('https://use.fontawesome.com/releases/v5.13.0/css/all.css')
+    ->appendStylesheet('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css')
     ->appendStylesheet('https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.jade.min.css')
     ->appendStylesheet($this->basePath('front-end/css/pico-override.css'))
     ->appendStylesheet($this->basePath('front-end/css/style.css'));
@@ -39,9 +39,8 @@ $this->headScript()
 // );
 
 // inline script which is printed at bottom of page
-// $this->inlineScript()
-//     ->appendFile('https://code.jquery.com/jquery-3.5.1.min.js');
-//
+$this->inlineScript()
+    ->appendFile($this->basePath('front-end/js/app.js'));
 ?>
 <?=$this->doctype();?>
 
@@ -64,28 +63,25 @@ $this->headScript()
                         </a>
                     </li>
                 </ul>
-                <!-- Links -->
                 <ul>
                     <li>
-                        <a href="https://docs.mezzio.dev/mezzio" target="_blank">
-                            <i class="fa fa-book"></i> Docs
+                        <a href="https://github.com/tyrsson/masteringmezzio.com" target="_blank">
+                            <i class="bi-github"></i>
                         </a>
                     </li>
                     <li>
-                        <a href="https://github.com/mezzio/mezzio" target="_blank">
-                            <i class="fa fa-wrench"></i> Contribute
+                        <a href="https://github.com/tyrsson/masteringmezzio.com/discussions" target="_blank">
+                            <i class="bi-envelope-fill"></i>
                         </a>
                     </li>
-                    <li>
-                        <a href="<?=$this->url('api.ping')?>">
-                            Ping Test
-                        </a>
-                    </li>
+                </ul>
+                <!-- Links -->
+                <ul>
                     <?php
-                    if ($this->user->getDetail('role_id') === 'Administrator'):
+                    if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
                     ?>
                     <li>
-                        <a href="<?=$this->url('admin')?>">
+                        <a href="<?=$this->url('admin.dashboard')?>">
                             Admin
                         </a>
                     </li>
@@ -93,7 +89,8 @@ $this->headScript()
                     endif;
                     ?>
                     <?php
-                    if ($this->user->getIdentity() === 'guest'):
+                    //if ($this->user->getIdentity() === 'guest'):
+                    if ($this->authz($this->request)->isGranted('user-manager.login')):
                     ?>
                     <li>
                         <a href="<?=$this->url('user-manager.login')?>">

@@ -13,10 +13,15 @@ use Mezzio\Authentication\Session\PhpSession;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider
 {
+    public const APPEND_HTTP_METHOD_TO_PERMS = 'append_http_method_to_permissions';
+    public const APPEND_ONLY_MAPPED          = 'append_only_mapped';
+    public const RBAC_MAPPED_ROUTES          = 'rbac_mapped_routes';
+
     public function __invoke(): array
     {
         return [
@@ -27,6 +32,12 @@ final class ConfigProvider
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
             'templates'                 => $this->getTemplates(),
+            'view_helpers'              => $this->getViewHelpers(),
+            static::class               => [
+                static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
+                static::APPEND_ONLY_MAPPED          => true, // bool true|false
+                static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
+            ],
         ];
     }
 
@@ -51,13 +62,13 @@ final class ConfigProvider
             ],
             'permissions' => [
                 'Guest' => [
-                    'home.read',
-                    'user-manager.login.read',
-                    'user-manager.register.read',
+                    'home',
+                    'user-manager.login',
+                    'user-manager.register',
                 ],
                 'User'  => [
                     'user-manager.logout',
-                    'user-manager.account',
+                    'user-manager.account.read',
                 ],
                 'Administrator' => [
                     'admin.dashboard.read',
@@ -70,9 +81,10 @@ final class ConfigProvider
     {
         return [
             'aliases' => [
-                AuthenticationInterface::class => PhpSession::class,
-                AuthorizationInterface::class  => Authz\Rbac::class,
-                UserRepositoryInterface::class => UserRepository\TableGateway::class,
+                AuthenticationInterface::class       => PhpSession::class,
+                AuthorizationInterface::class        => Authz\Rbac::class,
+                LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
+                UserRepositoryInterface::class       => UserRepository\TableGateway::class,
             ],
             'delegators' => [
                 Application::class => [
@@ -81,6 +93,7 @@ final class ConfigProvider
             ],
             'factories'  => [
                 Authz\Rbac::class                    => Authz\RbacFactory::class,
+                Authz\UserAssertion::class           => InvokableFactory::class,
                 Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
                 Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
@@ -108,6 +121,13 @@ final class ConfigProvider
             'factories' => [
                 Form\Login::class => Form\LoginFactory::class,
             ],
+        ];
+    }
+
+    public function getRbacMappedRoutes(): array
+    {
+        return [
+            'user-manager.account', 'admin.dashboard'
         ];
     }
 
@@ -163,6 +183,20 @@ final class ConfigProvider
                 'user-manager'             => [__DIR__ . '/../templates/user-manager'],
                 'user-manager-oob-partial' => [__DIR__ . '/../templates/oob-partial'],
                 'user-manager-partial'     => [__DIR__ . '/../templates/partial'],
+            ],
+        ];
+    }
+
+    public function getViewHelpers(): array
+    {
+        return [
+            'aliases'   => [
+                'authz'         => View\Helper\RbacHelper::class,
+                'rbac'          => View\Helper\RbacHelper::class,
+                'authorization' => View\Helper\RbacHelper::class,
+            ],
+            'factories' => [
+                View\Helper\RbacHelper::class => View\Helper\RbacHelperFactory::class,
             ],
         ];
     }

@@ -11,6 +11,8 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Authorization\Exception;
 use Psr\Container\ContainerInterface;
+use UserManager\ConfigProvider;
+use UserManager\Filter\HttpMethodToRbacPermissionFilter;
 
 use function is_array;
 use function sprintf;
@@ -48,7 +50,12 @@ class RbacFactory
 
         $assertion = $container->has(LaminasRbacAssertionInterface::class) ? $container->get(LaminasRbacAssertionInterface::class) : null;
 
-        return new Rbac($rbac, $assertion);
+        return new Rbac(
+            rbac: $rbac,
+            config: $container->get('config')[ConfigProvider::class],
+            filter: new HttpMethodToRbacPermissionFilter(),
+            assertion: $assertion
+        );
     }
 
     /**

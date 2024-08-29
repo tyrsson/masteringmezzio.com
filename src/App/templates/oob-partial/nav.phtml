@@ -1,34 +1,37 @@
+<?php
+declare(strict_types=1);
+
+use Mezzio\Authentication\UserInterface;
+$user = $this->request->getAttribute(UserInterface::class);
+?>
 <nav id="nav" hx-swap-oob="true">
     <!-- Brand -->
     <ul>
         <li>
             <a href="<?=$this->url('home')?>">
-                <img src="https://docs.laminas.dev/img/laminas-mezzio-rgb.svg" alt="Mastering Mezzio" width="300" />
+                <img src="<?=$this->basePath('front-end/images/mm7.png')?>" alt="Mastering Mezzio" width="300" />
+            </a>
+        </li>
+    </ul>
+    <ul>
+        <li>
+            <a href="https://github.com/tyrsson/masteringmezzio.com" target="_blank">
+                <i class="bi-github"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/tyrsson/masteringmezzio.com/discussions" target="_blank">
+                <i class="bi-envelope-fill"></i>
             </a>
         </li>
     </ul>
     <!-- Links -->
     <ul>
-        <li>
-            <a href="https://docs.mezzio.dev/mezzio" target="_blank">
-                <i class="fa fa-book"></i> Docs
-            </a>
-        </li>
-        <li>
-            <a href="https://github.com/mezzio/mezzio" target="_blank">
-                <i class="fa fa-wrench"></i> Contribute
-            </a>
-        </li>
-        <li>
-            <a href="<?=$this->url('api.ping')?>">
-                Ping Test
-            </a>
-        </li>
         <?php
-        if ($this->user->getDetail('role_id') === 'Administrator'):
+        if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
         ?>
         <li>
-            <a href="<?=$this->url('admin')?>">
+            <a href="<?=$this->url('admin.dashboard')?>">
                 Admin
             </a>
         </li>
@@ -36,7 +39,7 @@
         endif;
         ?>
         <?php
-        if ($this->user->getIdentity() === 'guest'):
+        if ($this->authz($this->request)->isGranted('user-manager.login')):
         ?>
         <li>
             <a href="<?=$this->url('user-manager.login')?>">

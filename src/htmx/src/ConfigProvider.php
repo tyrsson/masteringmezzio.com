@@ -7,7 +7,6 @@ namespace Htmx;
 use Laminas\Form\View\Helper\Form as LaminasFormHelper;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Laminas\View\Helper\Url as BaseUrlHelper;
-use Mezzio\Helper\UrlHelper;
 
 final class ConfigProvider
 {
@@ -35,10 +34,9 @@ final class ConfigProvider
         return [
             'aliases'   => [
                 'htmxTag' => View\Helper\HtmxTag::class,
-                //BaseUrlHelper::class => UrlHelper::class,
             ],
             'factories' => [
-                View\Helper\HtmxTag::class => InvokableFactory::class
+                View\Helper\HtmxTag::class => InvokableFactory::class,
             ],
             'delegators' => [
                 LaminasFormHelper::class => [

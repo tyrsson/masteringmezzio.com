@@ -1,7 +1,7 @@
 Template for UserManager\Handler\AccountHandler
 <?php
-if ($this->swapNav && isset($this->user)) {
-    $this->partial()->setObjectKey('user');
-    echo $this->partial('app-oob-partial::nav', $this->user);
+if ($this->swapNav && isset($this->request)) {
+    $this->partial()->setObjectKey('request');
+    echo $this->partial('app-oob-partial::nav', $this->request);
 }
 ?>

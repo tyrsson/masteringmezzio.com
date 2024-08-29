@@ -44,6 +44,12 @@ class TemplateMiddleware implements MiddlewareInterface
 
         $this->template->addDefaultParam(
             TemplateRendererInterface::TEMPLATE_ALL,
+            'request',
+            $request
+        );
+
+        $this->template->addDefaultParam(
+            TemplateRendererInterface::TEMPLATE_ALL,
             'currentRoute',
             $routeName
         );
