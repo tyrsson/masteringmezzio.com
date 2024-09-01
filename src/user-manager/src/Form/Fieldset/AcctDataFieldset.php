@@ -30,7 +30,7 @@ final class AcctDataFieldset extends Fieldset
             'name' => 'lastName',
             'type' => Text::class,
             'attributes' => [
-                'placeholder' => 'First Name',
+                'placeholder' => 'Last Name',
             ],
         ])->add([
             'name'    => 'email',
