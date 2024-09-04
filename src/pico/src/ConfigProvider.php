@@ -60,12 +60,9 @@ class ConfigProvider
         return [
             'doctype' => 'HTML5',
             'form_element_errors' => [
-                'message_open_format'      => '<div%s><ul><li>',
-                'message_separator_string' => '</li><li>',
-                'message_close_string'     => '</li></ul></div>',
-                // 'attributes'               => [
-                //     'aria-invalid' => 'true',
-                // ],
+                'message_open_format'      => '<small%s>',
+                'message_separator_string' => '',
+                'message_close_string'     => '</small>',
             ],
         ];
     }

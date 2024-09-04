@@ -26,7 +26,7 @@ final class Login extends Form\Form implements InputFilterProviderInterface
     public function init(): void
     {
         $this->setAttributes([
-            Htmx::HX_Post->value => $this->urlHelper->generate('user-manager.login'),
+            Htmx::HX_Post->value   => $this->urlHelper->generate('user-manager.login'),
             Htmx::HX_Target->value => '#app-main'
         ]);
         $this->add([

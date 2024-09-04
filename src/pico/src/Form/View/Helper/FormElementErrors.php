@@ -7,8 +7,13 @@ namespace Pico\Form\View\Helper;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\View\Helper\FormElementErrors as LaminasHelper;
 
+use function str_contains;
+use function str_replace;
+
 final class FormElementErrors extends LaminasHelper
 {
+    /** @var array Default attributes for the open format tag */
+    protected $attributes = ['class' => 'start-xs'];
     /** @inheritDoc */
     public function render(ElementInterface $element, array $attributes = []): string
     {
@@ -16,7 +21,16 @@ final class FormElementErrors extends LaminasHelper
         if (! $messages) {
             return '';
         }
-        $element->setAttribute('aria-invalid', 'true');
+        $name = $element->getAttribute('name');
+        $name = str_contains($name, '[') ? str_replace(['[', ']'], '-', $name) . 'helper' : $name . '-helper';
+
+        $element->setAttributes(
+            [
+                'aria-invalid'     => 'true',
+                'aria-describedby' => $name,
+            ]
+        );
+        $attributes['id'] = $name;
         return parent::render($element, $attributes);
     }
 }

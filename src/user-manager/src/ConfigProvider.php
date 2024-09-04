@@ -18,6 +18,7 @@ use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 final class ConfigProvider
 {
+    public const USERMANAGER_TABLE_NAME      = 'user-manager_table_name';
     public const APPEND_HTTP_METHOD_TO_PERMS = 'append_http_method_to_permissions';
     public const APPEND_ONLY_MAPPED          = 'append_only_mapped';
     public const RBAC_MAPPED_ROUTES          = 'rbac_mapped_routes';
@@ -29,11 +30,13 @@ final class ConfigProvider
             'dependencies'              => $this->getDependencies(),
             'filters'                   => $this->getFilters(),
             'form_elements'             => $this->getFormElementConfig(),
+            'input_filters'             => $this->getInputFilterConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
             'templates'                 => $this->getTemplates(),
             'view_helpers'              => $this->getViewHelpers(),
             static::class               => [
+                static::USERMANAGER_TABLE_NAME      => 'users',
                 static::APPEND_HTTP_METHOD_TO_PERMS => true, // bool true|false
                 static::APPEND_ONLY_MAPPED          => true, // bool true|false
                 static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
@@ -119,7 +122,18 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Form\Login::class => Form\LoginFactory::class,
+                Form\Login::class    => Form\LoginFactory::class,
+                Form\Register::class => Form\RegisterFactory::class,
+                Form\Fieldset\AcctDataFieldset::class => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+            ],
+        ];
+    }
+
+    public function getInputFilterConfig(): array
+    {
+        return [
+            'factories' => [
+                InputFilter\AcctDataFilter::class => InputFilter\AcctDataFilterFactory::class,
             ],
         ];
     }

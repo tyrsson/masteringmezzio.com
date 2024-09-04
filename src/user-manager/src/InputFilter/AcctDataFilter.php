@@ -9,20 +9,26 @@ use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Filter;
 use Laminas\Validator;
-use UserManager\UserRepository\TableGateway as UserRepository;
+use Webinertia\Filter\PasswordHash;
 
 class AcctDataFilter extends InputFilter implements AdapterAwareInterface
 {
     use AdapterAwareTrait;
 
     public function __construct(
-        private UserRepository $repo
+        private string $targetTable,
+        private string $targetColumn,
     ) {
     }
 
     public function init(): void
     {
-        $this->add(
+        $this->add($this->getSpec());
+    }
+
+    public function getSpec(): array
+    {
+        return  [
             [
                 'name'        => 'id',
                 'allow_empty' => true,
@@ -30,9 +36,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                     ['name' => Filter\ToInt::class],
                     ['name' => Filter\ToNull::class],
                 ],
-            ]
-        );
-        $this->add(
+            ],
             [
                 'name'     => 'firstName',
                 'required' => true,
@@ -50,9 +54,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                         ],
                     ],
                 ],
-            ]
-        );
-        $this->add(
+            ],
             [
                 'name'     => 'lastName',
                 'required' => true,
@@ -70,9 +72,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                         ],
                     ],
                 ],
-            ]
-        );
-        $this->add(
+            ],
             [
                 'name' => 'email',
                 'required' => true,
@@ -94,8 +94,8 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                     [
                         'name'    => Validator\Db\NoRecordExists::class,
                         'options' => [
-                            'table'     => $this->repo->getTable(),
-                            'field'     => 'email',
+                            'table'     => $this->targetTable,
+                            'field'     => $this->targetColumn,
                             'dbAdapter' => $this->adapter,
                             'messages'  => [
                                 Validator\Db\NoRecordExists::ERROR_RECORD_FOUND => 'Email is already in use!!',
@@ -103,8 +103,53 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                         ],
                     ],
                 ],
-            ]
-        );
-
+            ],
+            [
+                'name'     => 'password',
+                'required' => true,
+                'filters'  => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                    ['name' => PasswordHash::class], // custom webinertia filter
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\StringLength::class,
+                        'options' => [
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ],
+                    ]
+                ],
+            ],
+            [
+                'name'       => 'conf_password',
+                'required'   => true,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\StringLength::class,
+                        'options' => [
+                            'encoding' => 'UTF-8',
+                            'min'      => 1,
+                            'max'      => 100,
+                        ],
+                    ],
+                    [
+                        'name'    => Validator\Identical::class,
+                        'options' => [
+                            'token'    => 'password',
+                            'messages' => [
+                                Validator\Identical::NOT_SAME => 'Passwords are not the same',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

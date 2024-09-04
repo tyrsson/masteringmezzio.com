@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace UserManager\Form\Fieldset;
 
-use Laminas\Form\Element\Hidden;
-use Laminas\Form\Element\Text;
+use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Hydrator\ArraySerializableHydrator;
+use UserManager\InputFilter\AcctDataFilter;
 use UserManager\UserRepository\UserEntity;
 
-final class AcctDataFieldset extends Fieldset
+final class AcctDataFieldset extends Fieldset implements InputFilterProviderInterface
 {
+
     public function init(): void
     {
         $this->setHydrator(new ArraySerializableHydrator());
@@ -19,25 +21,45 @@ final class AcctDataFieldset extends Fieldset
 
         $this->add([
             'name' => 'id',
-            'type' => Hidden::class,
+            'type' => Element\Hidden::class,
         ])->add([
             'name' => 'firstName',
-            'type' => Text::class,
+            'type' => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'First Name',
             ],
         ])->add([
             'name' => 'lastName',
-            'type' => Text::class,
+            'type' => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'Last Name',
             ],
         ])->add([
             'name'    => 'email',
-            'type'    => Text::class,
+            'type'    => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'Email',
             ],
+        ])->add([
+            'name'    => 'password',
+            'type'    => Element\Password::class,
+            'attributes' => [
+                'placeholder' => 'Password',
+            ],
+        ])->add([
+            'name'    => 'conf_password',
+            'type'    => Element\Password::class,
+            'attributes' => [
+                'placeholder' => 'Confirm Password',
+            ],
         ]);
+    }
+
+    public function getInputFilterSpecification()
+    {
+        $manager = $this->getFormFactory()->getInputFilterFactory()->getInputFilterManager();
+        /** @var AcctDataFilter */
+        $filter  = $manager->get(AcctDataFilter::class);
+        return $filter->getSpec();
     }
 }

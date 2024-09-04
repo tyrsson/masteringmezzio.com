@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace UserManager\UserRepository;
 
 use Axleus\Db;
-use Laminas\Hydrator\ReflectionHydrator;
+use Laminas\Db\Sql\Where;
 use Mezzio\Authentication\Exception;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
@@ -24,7 +24,7 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
     public function __construct(
         protected Db\TableGateway $gateway,
         callable $userFactory,
-        protected $hydrator = new ReflectionHydrator(),
+        protected $hydrator,
         private array $config = []
     ) {
         parent::__construct($gateway, $hydrator);
@@ -43,8 +43,13 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
 
     public function authenticate(string $credential, ?string $password = null): ?UserInterface
     {
+        $select = $this->gateway->getSql()->select();
+        $where = new Where();
+        $where->equalTo($this->config['username'], $credential);
+        $where->isNotNull('verified');
+        $select->where($where);
         /** @var App\UserRepository\UserEntity */
-        $user = $this->findOneBy($this->config['username'], $credential);
+        $user = $this->gateway->selectWith($select)->current();
         $hash = $user->getPassword();
         $this->checkBcryptHash($hash);
         if (password_verify($password, $hash)) {

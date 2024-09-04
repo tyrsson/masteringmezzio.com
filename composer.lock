@@ -809,16 +809,16 @@
         },
         {
             "name": "laminas/laminas-form",
-            "version": "3.20.0",
+            "version": "3.20.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-form.git",
-                "reference": "a50af078506a46b7bf53a2d6cd30d36a221546b3"
+                "reference": "91ac71bd4862abf9c5e2ccc8f063f83b4999660b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-form/zipball/a50af078506a46b7bf53a2d6cd30d36a221546b3",
-                "reference": "a50af078506a46b7bf53a2d6cd30d36a221546b3",
+                "url": "https://api.github.com/repos/laminas/laminas-form/zipball/91ac71bd4862abf9c5e2ccc8f063f83b4999660b",
+                "reference": "91ac71bd4862abf9c5e2ccc8f063f83b4999660b",
                 "shasum": ""
             },
             "require": {
@@ -902,7 +902,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2024-07-08T06:59:53+00:00"
+            "time": "2024-08-22T08:29:18+00:00"
         },
         {
             "name": "laminas/laminas-httphandlerrunner",

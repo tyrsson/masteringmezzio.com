@@ -10,8 +10,6 @@ use Mezzio\Authentication\UserInterface;
 
 final class UserEntity extends ArrayObject implements Db\EntityInterface, UserInterface
 {
-    use Db\EntityTrait;
-
     public function __construct(
     ) {
         parent::__construct([], self::ARRAY_AS_PROPS);
