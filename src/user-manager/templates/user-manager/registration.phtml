@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-use Tracy\Debugger;
-
 $this->headTitle('Register');
-
 ?>
 <div class="row center-xs">
     <div class="col-xs-6">
@@ -18,9 +15,6 @@ $this->headTitle('Register');
                 }
             ?>
             </article>
-            <?php
-            Debugger::barDump($this->form->getMessages());
-            ?>
         </div>
     </div>
 </div>

@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 $this->headTitle(ucfirst($this->currentRoute));
 ?>
-<article>
-<?php
-    if (isset($this->form)) {
-        $this->form->setAttribute('action', $this->url('user-manager.login'));
-        echo $this->form($this->form);
-    }
-?>
-</article>
+<div class="row center-xs">
+    <div class="col-xs-6">
+        <div class="box">
+            <article>
+            <?php
+                if (isset($this->form)) {
+                    $this->form->setAttribute('action', $this->url('user-manager.login'));
+                    echo $this->form($this->form);
+                }
+            ?>
+            </article>
+        </div>
+    </div>
+</div>

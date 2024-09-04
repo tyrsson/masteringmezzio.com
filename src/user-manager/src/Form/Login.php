@@ -33,20 +33,14 @@ final class Login extends Form\Form implements InputFilterProviderInterface
             'name' => 'email',
             'type' => Form\Element\Text::class,
             'attributes' => [
-                //'placeholder' => 'User Name',
-            ],
-            'options' => [
-                'label' => 'Email',
+                'placeholder' => 'Email',
             ],
         ]);
         $this->add([
             'name' => 'password',
             'type' => Form\Element\Password::class,
             'attributes' => [
-                //'placeholder' => 'Email',
-            ],
-            'options' => [
-                'label' => 'Password',
+                'placeholder' => 'Password',
             ],
         ]);
         $this->add([

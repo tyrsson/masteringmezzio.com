@@ -48,8 +48,6 @@ class RegistrationHandler implements RequestHandlerInterface
     private function handlePost(ServerRequestInterface $request): ResponseInterface
     {
         $body = $request->getParsedBody();
-        //$userEntity = $request->getAttribute(UserInterface::class);
-        //$this->form->bind(new UserEntity([]));
         $this->form->setData($body);
         if ($this->form->isValid()) {
             $userEntity = $this->form->getData();
