@@ -59,6 +59,7 @@
         "mezzio/mezzio-helpers": "^5.7",
         "mezzio/mezzio-laminasviewrenderer": "^2.15",
         "mezzio/mezzio-session-ext": "^1.19",
+        "phpmailer/phpmailer": "^6.9",
         "webinertia/webinertia-filter": "^0.0.5"
     },
     "require-dev": {
@@ -77,7 +78,8 @@
             "App\\": "src/App/src/",
             "Htmx\\": "src/htmx/src",
             "UserManager\\": "src/user-manager/src/",
-            "Pico\\": "src/pico/src/"
+            "Pico\\": "src/pico/src/",
+            "Mail\\": "src/mail/src/"
         }
     },
     "autoload-dev": {

@@ -6,6 +6,7 @@ namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+use Mail\MailerAwareDelegator;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
@@ -92,6 +93,9 @@ final class ConfigProvider
             'delegators' => [
                 Application::class => [
                     ApplicationConfigInjectionDelegator::class,
+                ],
+                Handler\RegistrationHandler::class => [
+                    MailerAwareDelegator::class,
                 ],
             ],
             'factories'  => [
