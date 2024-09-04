@@ -7,7 +7,6 @@ namespace UserManager\Handler;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -15,7 +14,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\Form\Register;
 use UserManager\UserRepository\TableGateway;
-use UserManager\UserRepository\UserEntity;
 
 class RegistrationHandler implements RequestHandlerInterface
 {
