@@ -23,6 +23,9 @@ final class AcctDataFieldset extends Fieldset implements InputFilterProviderInte
             'name' => 'id',
             'type' => Element\Hidden::class,
         ])->add([
+            'name' => 'verificationToken',
+            'type' => Element\Hidden::class,
+        ])->add([
             'name' => 'firstName',
             'type' => Element\Text::class,
             'attributes' => [

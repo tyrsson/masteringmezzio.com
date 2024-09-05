@@ -10,6 +10,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Filter;
 use Laminas\Validator;
 use Webinertia\Filter\PasswordHash;
+use Webinertia\Filter\Uuid;
 
 class AcctDataFilter extends InputFilter implements AdapterAwareInterface
 {
@@ -35,6 +36,15 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                 'filters'     => [
                     ['name' => Filter\ToInt::class],
                     ['name' => Filter\ToNull::class],
+                ],
+            ],
+            [
+                'name'        => 'verificationToken',
+                'allow_empty' => true,
+                'filters'     => [
+                    ['name' => Filter\ToInt::class],
+                    ['name' => Filter\ToNull::class],
+                    ['name' => Uuid::class],
                 ],
             ],
             [

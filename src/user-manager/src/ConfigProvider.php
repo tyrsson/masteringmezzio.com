@@ -6,6 +6,8 @@ namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+use Mail\ConfigProvider as MailConfigProvider;
+use Mail\Adapter\PhpMailer;
 use Mail\MailerAwareDelegator;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
@@ -16,6 +18,7 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
+use UserManager\Middleware\PhpMailerMiddleware;
 
 final class ConfigProvider
 {
@@ -42,6 +45,7 @@ final class ConfigProvider
                 static::APPEND_ONLY_MAPPED          => true, // bool true|false
                 static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
             ],
+            MailConfigProvider::class => $this->getMailConfig(),
         ];
     }
 
@@ -94,9 +98,6 @@ final class ConfigProvider
                 Application::class => [
                     ApplicationConfigInjectionDelegator::class,
                 ],
-                Handler\RegistrationHandler::class => [
-                    MailerAwareDelegator::class,
-                ],
             ],
             'factories'  => [
                 Authz\Rbac::class                    => Authz\RbacFactory::class,
@@ -142,6 +143,18 @@ final class ConfigProvider
         ];
     }
 
+    public function getMailConfig(): array
+    {
+        return [
+            PhpMailer::class => [
+                'message_templates' => [
+                    'verification_subject' => '%s Account Verification.',
+                    'verification_body'    => 'Please click the link to verify your email address <a href="%s/user-manager/verify/%s">Click Here!!</a>',
+                ],
+            ],
+        ];
+    }
+
     public function getRbacMappedRoutes(): array
     {
         return [
@@ -176,7 +189,7 @@ final class ConfigProvider
                 'name'        => 'user-manager.register',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    //AuthorizationMiddleware::class,
+                    PhpMailerMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],

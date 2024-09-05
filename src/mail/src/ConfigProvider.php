@@ -29,9 +29,7 @@ class ConfigProvider
     public function getAdapterConfig(): array
     {
         return [
-            Adapter\PhpMailer::class => [
-
-            ],
+            Adapter\PhpMailer::class => [],
         ];
     }
 

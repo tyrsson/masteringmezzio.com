@@ -14,10 +14,15 @@ declare(strict_types=1);
  * `composer development-enable`.
  */
 
+use Mail\ConfigProvider;
+use Mail\Adapter\PhpMailer;
 use Mezzio\Container;
 use Mezzio\Middleware\ErrorResponseGenerator;
 
 return [
+    'app_settings' => [
+        'app_name' => 'Mastering Mezzio',
+    ],
     'dependencies' => [
         'factories' => [
             ErrorResponseGenerator::class => Container\WhoopsErrorResponseGeneratorFactory::class,
@@ -38,5 +43,12 @@ return [
             'access_token' => 'EAAAlznqj8RR028pFt00_5szKKRa-Z1E6KcDQURktYsr_gICtzjz3cF0Gk97Wkrk',
         ],
         'api_version' => '2024-07-17',
+    ],
+    ConfigProvider::class => [
+        PhpMailer::class => [
+            'host'      => '127.0.0.1',
+            'smtp_auth' => true,
+            'port'      => 25,
+        ],
     ],
 ];

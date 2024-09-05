@@ -60,6 +60,7 @@
         "mezzio/mezzio-laminasviewrenderer": "^2.15",
         "mezzio/mezzio-session-ext": "^1.19",
         "phpmailer/phpmailer": "^6.9",
+        "ramsey/uuid": "^4.7",
         "webinertia/webinertia-filter": "^0.0.5"
     },
     "require-dev": {

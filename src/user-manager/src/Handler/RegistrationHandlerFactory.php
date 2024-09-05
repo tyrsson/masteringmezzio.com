@@ -18,7 +18,8 @@ class RegistrationHandlerFactory
         return new RegistrationHandler(
             $container->get(TemplateRendererInterface::class),
             $container->get(UserRepositoryInterface::class),
-            $manager->get(Register::class)
+            $manager->get(Register::class),
+            $container->get('config')
         );
     }
 }

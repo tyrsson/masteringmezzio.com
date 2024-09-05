@@ -12,20 +12,23 @@ use Mail\MailerAwareInterfaceTrait;
 use Mail\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Template\TemplateRendererInterface;
+use PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as MailException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\Form\Register;
 use UserManager\UserRepository\TableGateway;
 
-class RegistrationHandler implements RequestHandlerInterface, MailerAwareInterface
-{
-    use MailerAwareInterfaceTrait;
+use function sprintf;
 
+class RegistrationHandler implements RequestHandlerInterface
+{
     public function __construct(
         private TemplateRendererInterface $renderer,
         private UserRepositoryInterface&TableGateway $userRepositoryInterface,
-        private Register $form
+        private Register $form,
+        private array $config
     ) {
     }
 
@@ -55,7 +58,26 @@ class RegistrationHandler implements RequestHandlerInterface, MailerAwareInterfa
         if ($this->form->isValid()) {
             $userEntity = $this->form->getData();
             $userEntity->offsetUnset('conf_password');
-            $result = $this->userRepositoryInterface->save($userEntity, 'id');
+
+            try {
+                $result = $this->userRepositoryInterface->save($userEntity, 'id');
+                /** @var PHPMailer */
+                $mailer = $request->getAttribute(MailerInterface::class);
+                $mailer?->setFrom('registration@masteringmezzio.com');
+                $mailer?->addAddress(
+                    $result->email,
+                    $result->firstName . ' ' . $result->lastName
+                );
+                $mailer?->isHTML();
+                $body = $mailer?->getBody();
+                $mailer?->setBody(sprintf(
+                    $body,
+                    $result->verificationToken
+                ));
+                $mailer?->send();
+            } catch (\Throwable|MailException $e) {
+                //throw $th;
+            }
         }
 
         return new HtmlResponse($this->renderer->render(
