@@ -63,7 +63,7 @@ class RegistrationHandler implements RequestHandlerInterface
                 $result = $this->userRepositoryInterface->save($userEntity, 'id');
                 /** @var PHPMailer */
                 $mailer = $request->getAttribute(MailerInterface::class);
-                $mailer?->setFrom('registration@masteringmezzio.com');
+                //$mailer?->setFrom('registration@masteringmezzio.com');
                 $mailer?->addAddress(
                     $result->email,
                     $result->firstName . ' ' . $result->lastName

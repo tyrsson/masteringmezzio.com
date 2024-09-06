@@ -49,6 +49,7 @@ return [
             'host'      => '127.0.0.1',
             'smtp_auth' => true,
             'port'      => 25,
+            'from_address' => 'registration@masteringmezzio.com',
         ],
     ],
 ];

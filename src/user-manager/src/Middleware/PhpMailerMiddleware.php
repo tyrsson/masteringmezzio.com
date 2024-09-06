@@ -18,9 +18,10 @@ use function sprintf;
 
 class PhpMailerMiddleware implements MiddlewareInterface
 {
-    private const SUBJECT_KEY = 'verification_subject';
-    private const BODY_KEY    = 'verification_body';
-    private const TEMPLATE_KEY = 'message_templates';
+    public final const SUBJECT_KEY  = 'verification_subject';
+    public final const BODY_KEY     = 'verification_body';
+    public final const TEMPLATE_KEY = 'message_templates';
+    public final const FROM_ADDRESS_KEY = 'from_address';
 
     public function __construct(
         private MailerInterface&PhpMailer $mailerInterface,
@@ -32,16 +33,27 @@ class PhpMailerMiddleware implements MiddlewareInterface
     {
         /** @var RouteResult */
         $routeResult = $request->getAttribute(RouteResult::class);
-        $routeName   = $routeResult->getMatchedRouteName();
-        if ($routeName === 'user-manager.register' && $request->getMethod() === Http::METHOD_POST) {
+
+        return match ($routeResult->getMatchedRouteName()) {
+            'user-manager.register' => $handler->handle($this->configureRegistration($request)),
+            default => $handler->handle($request),
+        };
+    }
+
+    private function configureRegistration(ServerRequestInterface $request): ServerRequestInterface
+    {
+        /** @var RouteResult */
+
+        if ($request->getMethod() === Http::METHOD_POST) {
             if (! empty($this->config[ConfigProvider::class][PhpMailer::class])) {
                 $config = $this->config[ConfigProvider::class][PhpMailer::class];
             }
-            $host = 'http://masteringmezzio.com';
+            $serverParams = $request->getServerParams();
+            $host         = $serverParams['REQUEST_SCHEME'] . '//' . $serverParams['HTTP_HOST'];
 
             /** @var PhpMailer */
             $mailer  = clone $this->mailerInterface;
-            //$subject =
+            $mailer->setFrom($config[static::FROM_ADDRESS_KEY]);
             $mailer->setSubject(sprintf(
                 $config[static::TEMPLATE_KEY][static::SUBJECT_KEY],
                 $this->config['app_settings']['app_name']
@@ -53,6 +65,6 @@ class PhpMailerMiddleware implements MiddlewareInterface
             ));
             $request = $request->withAttribute(MailerInterface::class, $mailer);
         }
-        return $handler->handle($request);
+        return $request;
     }
 }
