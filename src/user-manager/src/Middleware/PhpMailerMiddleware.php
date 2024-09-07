@@ -24,7 +24,7 @@ class PhpMailerMiddleware implements MiddlewareInterface
     public final const FROM_ADDRESS_KEY = 'from_address';
 
     public function __construct(
-        private MailerInterface&PhpMailer $mailerInterface,
+        private MailerInterface|PhpMailer $mailerInterface,
         private array $config
     ){
     }
@@ -35,34 +35,35 @@ class PhpMailerMiddleware implements MiddlewareInterface
         $routeResult = $request->getAttribute(RouteResult::class);
 
         return match ($routeResult->getMatchedRouteName()) {
-            'user-manager.register' => $handler->handle($this->configureRegistration($request)),
+            'user-manager.register' => $handler->handle($this->prepareVerification($request)),
             default => $handler->handle($request),
         };
     }
 
-    private function configureRegistration(ServerRequestInterface $request): ServerRequestInterface
+    private function prepareVerification(ServerRequestInterface $request): ServerRequestInterface
     {
-        /** @var RouteResult */
-
         if ($request->getMethod() === Http::METHOD_POST) {
             if (! empty($this->config[ConfigProvider::class][PhpMailer::class])) {
                 $config = $this->config[ConfigProvider::class][PhpMailer::class];
             }
             $serverParams = $request->getServerParams();
             $host         = $serverParams['REQUEST_SCHEME'] . '//' . $serverParams['HTTP_HOST'];
-
             /** @var PhpMailer */
-            $mailer  = clone $this->mailerInterface;
+            $mailer = $this->mailerInterface;
             $mailer->setFrom($config[static::FROM_ADDRESS_KEY]);
-            $mailer->setSubject(sprintf(
-                $config[static::TEMPLATE_KEY][static::SUBJECT_KEY],
-                $this->config['app_settings']['app_name']
-            ));
-            $mailer->setBody(sprintf(
-                $config[static::TEMPLATE_KEY][static::BODY_KEY],
-                $host,
-                '%s'
-            ));
+            $mailer->setSubject(
+                sprintf(
+                    $config[static::TEMPLATE_KEY][static::SUBJECT_KEY],
+                    $this->config['app_settings']['app_name']
+                )
+            );
+            $mailer->setBody(
+                sprintf(
+                    $config[static::TEMPLATE_KEY][static::BODY_KEY],
+                    $host,
+                    '%s'
+                )
+            );
             $request = $request->withAttribute(MailerInterface::class, $mailer);
         }
         return $request;

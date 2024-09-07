@@ -149,7 +149,7 @@ final class ConfigProvider
             PhpMailer::class => [
                 'message_templates' => [
                     'verification_subject' => '%s Account Verification.',
-                    'verification_body'    => 'Please click the link to verify your email address <a href="%s/user-manager/verify/%s">Click Here!!</a>',
+                    'verification_body'    => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
                 ],
             ],
         ];
@@ -191,6 +191,16 @@ final class ConfigProvider
                     BodyParamsMiddleware::class,
                     PhpMailerMiddleware::class,
                     Handler\RegistrationHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
+                'path'        => '/user-manager/verify/{id:\d+}/{token:[a-zA-Z0-9-]+}',
+                'name'        => 'user-manager.verify',
+                'middleware'  => [
+                    BodyParamsMiddleware::class,
+                    PhpMailerMiddleware::class,
+                    Handler\VerifyAccountHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],

@@ -11,6 +11,7 @@ use Mail\MailerAwareInterface;
 use Mail\MailerAwareInterfaceTrait;
 use Mail\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailException;
@@ -28,6 +29,7 @@ class RegistrationHandler implements RequestHandlerInterface
         private TemplateRendererInterface $renderer,
         private UserRepositoryInterface&TableGateway $userRepositoryInterface,
         private Register $form,
+        private UrlHelper $urlHelper,
         private array $config
     ) {
     }
@@ -70,9 +72,13 @@ class RegistrationHandler implements RequestHandlerInterface
                 );
                 $mailer?->isHTML();
                 $body = $mailer?->getBody();
+                $verifyPath = $this->urlHelper->generate(
+                    'user-manager.verify',
+                    ['id' => $result->id, 'token' => $result->verificationToken]
+                );
                 $mailer?->setBody(sprintf(
                     $body,
-                    $result->verificationToken
+                    $verifyPath
                 ));
                 $mailer?->send();
             } catch (\Throwable|MailException $e) {
