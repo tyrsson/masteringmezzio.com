@@ -7,8 +7,6 @@ namespace UserManager\Handler;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
-use Mail\MailerAwareInterface;
-use Mail\MailerAwareInterfaceTrait;
 use Mail\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Helper\UrlHelper;

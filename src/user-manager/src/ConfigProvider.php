@@ -73,6 +73,7 @@ final class ConfigProvider
                     'home',
                     'user-manager.login',
                     'user-manager.register',
+                    'user-manager.verify',
                 ],
                 'User'  => [
                     'user-manager.logout',
@@ -127,9 +128,10 @@ final class ConfigProvider
     {
         return [
             'factories' => [
+                Form\Fieldset\AcctDataFieldset::class => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
                 Form\Login::class    => Form\LoginFactory::class,
                 Form\Register::class => Form\RegisterFactory::class,
-                Form\Fieldset\AcctDataFieldset::class => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\ResendVerification::class => Form\ResendVerificationFactory::class,
             ],
         ];
     }
@@ -195,7 +197,7 @@ final class ConfigProvider
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/verify/{id:\d+}/{token:[a-zA-Z0-9-]+}',
+                'path'        => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
                 'name'        => 'user-manager.verify',
                 'middleware'  => [
                     BodyParamsMiddleware::class,

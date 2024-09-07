@@ -47,7 +47,7 @@ class PhpMailerMiddleware implements MiddlewareInterface
                 $config = $this->config[ConfigProvider::class][PhpMailer::class];
             }
             $serverParams = $request->getServerParams();
-            $host         = $serverParams['REQUEST_SCHEME'] . '//' . $serverParams['HTTP_HOST'];
+            $host         = $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'];
             /** @var PhpMailer */
             $mailer = $this->mailerInterface;
             $mailer->setFrom($config[static::FROM_ADDRESS_KEY]);

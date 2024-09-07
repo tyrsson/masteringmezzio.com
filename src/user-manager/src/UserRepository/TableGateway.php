@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace UserManager\UserRepository;
 
 use Axleus\Db;
+use Axleus\Db\EntityInterface;
+use Laminas\Db\Sql\Select;
 use Laminas\Db\Sql\Where;
 use Mezzio\Authentication\Exception;
 use Mezzio\Authentication\UserInterface;
@@ -60,6 +62,18 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
             );
         }
         return null;
+    }
+
+    public function findOneBy(string $column, mixed $value, ?array $columns = [Select::SQL_STAR], ?array $joins = null): ?EntityInterface
+    {
+        $select = $this->gateway->getSql()->select();
+        $where = new Where();
+        $where->equalTo($column, $value);
+        $select->where($where);
+        /** @var App\UserRepository\UserEntity */
+        $user = $this->gateway->selectWith($select)->current();
+        // todo: add exception handling
+        return $user;
     }
 
     /**

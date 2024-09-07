@@ -7,11 +7,11 @@ namespace UserManager\Form;
 use Mezzio\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
 
-final class RegisterFactory
+final class ResendVerificationFactory
 {
-    public function __invoke(ContainerInterface $container): Register
+    public function __invoke(ContainerInterface $container): ResendVerification
     {
-        $form = new Register();
+        $form = new ResendVerification();
         $form->setUrlHelper($container->get(UrlHelper::class));
         return $form;
     }
