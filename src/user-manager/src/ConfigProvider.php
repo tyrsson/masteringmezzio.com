@@ -30,6 +30,7 @@ final class ConfigProvider
     public function __invoke(): array
     {
         return [
+            'app_settings'              => $this->getAppSettings(),
             'authentication'            => $this->getAuthenticationConfig(),
             'dependencies'              => $this->getDependencies(),
             'filters'                   => $this->getFilters(),
@@ -46,6 +47,13 @@ final class ConfigProvider
                 static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
             ],
             MailConfigProvider::class => $this->getMailConfig(),
+        ];
+    }
+
+    public function getAppSettings(): array
+    {
+        return [
+            'account_verification_token_expire_time' => '30 Seconds',
         ];
     }
 

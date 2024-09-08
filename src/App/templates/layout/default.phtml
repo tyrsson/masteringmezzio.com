@@ -59,7 +59,7 @@ $this->inlineScript()
                 <!-- Brand -->
                 <ul>
                     <li>
-                        <a href="<?=$this->url('home')?>">
+                        <a href="<?=$this->url('home')?>" hx-get="<?=$this->url('home')?>" hx-target="#app-main">
                             <img src="<?=$this->basePath('front-end/images/mm7.png')?>" alt="Mastering Mezzio" width="300" />
                         </a>
                     </li>
@@ -82,7 +82,7 @@ $this->inlineScript()
                     if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
                     ?>
                     <li>
-                        <a href="<?=$this->url('admin.dashboard')?>">
+                        <a href="<?=$this->url('admin.dashboard')?>" hx-get="<?=$this->url('admin.dashboard')?>" hx-target="#app-main">
                             Admin
                         </a>
                     </li>
@@ -94,12 +94,12 @@ $this->inlineScript()
                     if ($this->authz($this->request)->isGranted('user-manager.login')):
                     ?>
                     <li>
-                        <a href="<?=$this->url('user-manager.login')?>">
+                        <a href="<?=$this->url('user-manager.login')?>" hx-get="<?=$this->url('user-manager.login')?>" hx-target="#app-main">
                             Sign In
                         </a>
                     </li>
                     <li>
-                        <a href="<?=$this->url('user-manager.register')?>">
+                        <a href="<?=$this->url('user-manager.register')?>" hx-get="<?=$this->url('user-manager.register')?>" hx-target="#app-main">
                             Register
                         </a>
                     </li>
@@ -107,7 +107,7 @@ $this->inlineScript()
                     else:
                     ?>
                     <li>
-                        <a href="<?=$this->url('user-manager.account')?>">
+                        <a href="<?=$this->url('user-manager.account')?>" hx-get="<?=$this->url('user-manager.account')?>" hx-target="#app-main">
                             Account
                         </a>
                     </li>
