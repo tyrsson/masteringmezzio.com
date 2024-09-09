@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ramsey\Uuid\Rfc4122\UuidV7;
 use UserManager\Form\ResendVerification;
+use UserManager\Helper\VerificationHelper;
 use UserManager\UserRepository\TableGateway;
 use UserManager\UserRepository\UserEntity;
 
@@ -31,7 +32,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
 {
     public function __construct(
         private TemplateRendererInterface $renderer,
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private VerificationHelper $verifyHelper,
         private ResendVerification $form,
         private UrlHelper $urlHelper,
         private array $config
@@ -48,52 +49,25 @@ class VerifyAccountHandler implements RequestHandlerInterface
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var RouteResult */
-        $routeResult   = $request->getAttribute(RouteResult::class);
-        $matchedParams = $routeResult->getMatchedParams();
         try {
-            /** @var UserEntity */
-            $target = $this->userRepositoryInterface->findOneBy('id', $matchedParams['id']);
-            if (! $target instanceof UserEntity) {
-                // throw exception
-            }
-            if ($matchedParams['token'] === $target->offsetGet('verificationToken')) {
-                /** @var Uuidv7 */
-                $uuid          = UuidV7::fromString($target->offsetGet('verificationToken'));
-                $tokenDatetime = $uuid->getDateTime();
-                $now           = new DateTimeImmutable();
-                $expire        = $tokenDatetime->add(
-                    DateInterval::createFromDateString(
-                        $this->config['app_settings']['account_verification_token_expire_time']
-                    )
-                );
-                if ($now <= $expire) {
-                    $timeStamp = $now->format($this->config['app_settings']['datetime_format']);
-                    $target->offsetSet(
-                        'dateVerified',
-                        $timeStamp
-                    );
-                    $target->offsetSet('dateUpdated', $timeStamp);
-                    $target->offsetSet('verified', 1);
-                    $target->offsetSet('verificationToken', null);
-                    $this->userRepositoryInterface->save($target, 'id');
-                } else {
-                    // unset this to allow a new token to be generated
-                    $target->offsetUnset('verificationToken');
-                    // send form to resend email
-                    $this->form->bind($target);
-                    $this->form->setAttributes([
-                        Htmx::HX_Post->value   => $this->urlHelper->generate(
-                            routeName: 'user-manager.verify',
-                            options: ['reuse_result_params' => false]
-                        ),
-                        Htmx::HX_Target->value => '#app-main',
-                    ]);
-                    return new HtmlResponse($this->renderer->render(
-                        'user-manager::verify-account',
-                        ['form' => $this->form] // parameters to pass to template
-                    ));
-                }
+            if (! $this->verifyHelper->verify($request)) {
+                /** @var UserEntity */
+                $target = $this->verifyHelper->getTarget();
+                // unset this to allow a new token to be generated
+                $target->offsetUnset('verificationToken');
+                // send form to resend email
+                $this->form->bind($target);
+                $this->form->setAttributes([
+                    Htmx::HX_Post->value => $this->urlHelper->generate(
+                        routeName: 'user-manager.verify',
+                        options: ['reuse_result_params' => false]
+                    ),
+                    Htmx::HX_Target->value => '#app-main',
+                ]);
+                return new HtmlResponse($this->renderer->render(
+                    'user-manager::verify-account',
+                    ['form' => $this->form] // parameters to pass to template
+                ));
             }
         } catch (\Throwable $th) {
             throw $th;

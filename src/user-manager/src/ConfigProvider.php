@@ -8,7 +8,6 @@ use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mail\ConfigProvider as MailConfigProvider;
 use Mail\Adapter\PhpMailer;
-use Mail\MailerAwareDelegator;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
@@ -53,7 +52,7 @@ final class ConfigProvider
     public function getAppSettings(): array
     {
         return [
-            'account_verification_token_expire_time' => '30 Seconds',
+            'account_verification_token_expire_time' => '1 Hour',
         ];
     }
 
@@ -97,7 +96,7 @@ final class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'aliases' => [
+            'aliases'    => [
                 AuthenticationInterface::class       => PhpSession::class,
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
@@ -117,6 +116,7 @@ final class ConfigProvider
                 Handler\RegistrationHandler::class   => Handler\RegistrationHandlerFactory::class,
                 Handler\ResetPasswordHandler::class  => Handler\ResetPasswordHandlerFactory::class,
                 Handler\VerifyAccountHandler::class  => Handler\VerifyAccountHandlerFactory::class,
+                Helper\VerificationHelper::class     => Helper\VerificationHelperFactory::class,
                 Middleware\IdentityMiddleware::class => Middleware\IdentityMiddlewareFactory::class,
                 UserRepository\TableGateway::class   => UserRepository\TableGatewayFactory::class,
             ],
