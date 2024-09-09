@@ -14,7 +14,7 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
-    \Mail\ConfigProvider::class,
+    \Mailer\ConfigProvider::class,
     \Mezzio\Authorization\Rbac\ConfigProvider::class,
     \Mezzio\Authorization\ConfigProvider::class,
     \Webinertia\Filter\ConfigProvider::class,

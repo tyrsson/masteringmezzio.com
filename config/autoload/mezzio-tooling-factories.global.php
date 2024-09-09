@@ -13,7 +13,6 @@ declare(strict_types=1);
 return [
     'dependencies' => [
         'factories' => [
-            UserManager\Middleware\PhpMailerMiddleware::class => UserManager\Middleware\PhpMailerMiddlewareFactory::class,
         ],
     ],
 ];

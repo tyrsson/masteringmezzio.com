@@ -14,8 +14,8 @@ declare(strict_types=1);
  * `composer development-enable`.
  */
 
-use Mail\ConfigProvider;
-use Mail\Adapter\PhpMailer;
+use Mailer\ConfigProvider;
+use Mailer\Adapter\AdapterInterface;
 use Mezzio\Container;
 use Mezzio\Middleware\ErrorResponseGenerator;
 
@@ -46,13 +46,13 @@ return [
         'api_version' => '2024-07-17',
     ],
     ConfigProvider::class => [
-        PhpMailer::class => [
+        AdapterInterface::class => [
             'host'      => '127.0.0.1',
             'smtp_auth' => true,
             'port'      => 25,
             'username'  => '',
             'password'  => '',
-            'from_address' => 'registration@masteringmezzio.com',
+            'from' => 'registration@masteringmezzio.com',
         ],
     ],
 ];

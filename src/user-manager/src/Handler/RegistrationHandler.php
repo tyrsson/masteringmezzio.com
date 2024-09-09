@@ -8,15 +8,17 @@ use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mail\MailerInterface;
+use Mailer\Adapter\AdapterInterface;
+use Mailer\ConfigProvider as MailConfigProvider;
+use Mailer\Mailer;
+use Mailer\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
-use PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as MailException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UserManager\ConfigProvider;
 use UserManager\Form\Register;
 use UserManager\UserRepository\TableGateway;
 
@@ -61,27 +63,41 @@ class RegistrationHandler implements RequestHandlerInterface
             $userEntity->offsetUnset('conf_password');
 
             try {
+                $serverParams = $request->getServerParams();
                 $result = $this->userRepositoryInterface->save($userEntity, 'id');
-                /** @var PHPMailer */
+                /** @var Mailer */
                 $mailer = $request->getAttribute(MailerInterface::class);
-                //$mailer?->setFrom('registration@masteringmezzio.com');
-                $mailer?->addAddress(
+                /** @var PhpMailer */
+                $adapter = $mailer->getAdapter();
+                $mailConfig = $this->config[MailConfigProvider::class][AdapterInterface::class] ?? null;
+                $adapter?->to(
                     $result->email,
                     $result->firstName . ' ' . $result->lastName
                 );
-                $mailer?->isHTML();
-                $body = $mailer?->getBody();
-                $verifyPath = $this->urlHelper->generate(
-                    'user-manager.verify',
-                    ['id' => $result->id, 'token' => $result->verificationToken]
+                $adapter?->isHTML();
+                $adapter?->subject(
+                    sprintf(
+                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_SUBJECT],
+                        $this->config['app_settings']['app_name']
+                    )
                 );
-                $mailer?->setBody(sprintf(
-                    $body,
-                    $verifyPath
-                ));
-                $mailer?->send();
-            } catch (\Throwable|MailException $e) {
-                //throw $th;
+                $adapter?->body(
+                    sprintf(
+                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
+                        $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
+                        $this->urlHelper->generate(
+                            routeName: 'user-manager.verify',
+                            routeParams: [
+                                'id'    => $result->id,
+                                'token' => $result->verificationToken,
+                            ],
+                            options: ['reuse_query_params' => false]
+                        )
+                    )
+                );
+                $mailer?->send($adapter);
+            } catch (\Throwable) {
+                throw $th;
             }
             return new RedirectResponse(
                 $this->urlHelper->generate('home')

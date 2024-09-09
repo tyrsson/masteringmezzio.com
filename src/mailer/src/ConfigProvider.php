@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mail;
+namespace Mailer;
 
 /**
  * The configuration provider for the mail module
@@ -29,7 +29,7 @@ class ConfigProvider
     public function getAdapterConfig(): array
     {
         return [
-            Adapter\PhpMailer::class => [],
+            Adapter\AdapterInterface::class => [],
         ];
     }
 
@@ -40,10 +40,13 @@ class ConfigProvider
     {
         return [
             'aliases' => [
-                MailerInterface::class => Adapter\PhpMailer::class,
+                Adapter\AdapterInterface::class => Adapter\PhpMailer::class, // required mapping
+                MailerInterface::class          => Mailer::class,
             ],
             'factories'  => [
-                Adapter\PhpMailer::class => Adapter\PhpMailerFactory::class,
+                Adapter\PhpMailer::class           => Adapter\PhpMailerFactory::class,
+                Mailer::class                      => MailerFactory::class,
+                Middleware\MailerMiddleware::class => Middleware\MailerMiddlewareFactory::class
             ],
         ];
     }

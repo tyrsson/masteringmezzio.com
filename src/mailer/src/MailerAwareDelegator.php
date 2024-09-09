@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mail;
+namespace Mailer;
 
-use Mail\MailerInterface;
-use Mail\MailerAwareInterface;
+use Mailer\MailerInterface;
+use Mailer\MailerAwareInterface;
 use Psr\Container\ContainerInterface;
 
 final class MailerAwareDelegator

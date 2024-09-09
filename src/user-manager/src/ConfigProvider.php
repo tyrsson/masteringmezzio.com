@@ -6,8 +6,9 @@ namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
-use Mail\ConfigProvider as MailConfigProvider;
-use Mail\Adapter\PhpMailer;
+use Mailer\ConfigProvider as MailConfigProvider;
+use Mailer\Adapter\AdapterInterface;
+use Mailer\Middleware\MailerMiddleware;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
@@ -17,14 +18,16 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-use UserManager\Middleware\PhpMailerMiddleware;
 
 final class ConfigProvider
 {
-    public const USERMANAGER_TABLE_NAME      = 'user-manager_table_name';
-    public const APPEND_HTTP_METHOD_TO_PERMS = 'append_http_method_to_permissions';
-    public const APPEND_ONLY_MAPPED          = 'append_only_mapped';
-    public const RBAC_MAPPED_ROUTES          = 'rbac_mapped_routes';
+    public final const MAIL_MESSAGE_TEMPLATES   = 'message_templates';
+    public final const MAIL_VERIFY_MESSAGE_BODY = 'verify_message_body';
+    public final const MAIL_VERIFY_SUBJECT      = 'verify_message_subject';
+    public const USERMANAGER_TABLE_NAME         = 'user-manager_table_name';
+    public const APPEND_HTTP_METHOD_TO_PERMS    = 'append_http_method_to_permissions';
+    public const APPEND_ONLY_MAPPED             = 'append_only_mapped';
+    public const RBAC_MAPPED_ROUTES             = 'rbac_mapped_routes';
 
     public function __invoke(): array
     {
@@ -156,10 +159,10 @@ final class ConfigProvider
     public function getMailConfig(): array
     {
         return [
-            PhpMailer::class => [
-                'message_templates' => [
-                    'verification_subject' => '%s Account Verification.',
-                    'verification_body'    => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
+            AdapterInterface::class => [
+                static::MAIL_MESSAGE_TEMPLATES => [
+                    static::MAIL_VERIFY_SUBJECT      => '%s Account Verification.',
+                    static::MAIL_VERIFY_MESSAGE_BODY => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
                 ],
             ],
         ];
@@ -199,7 +202,7 @@ final class ConfigProvider
                 'name'        => 'user-manager.register',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    PhpMailerMiddleware::class,
+                    MailerMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
@@ -209,7 +212,7 @@ final class ConfigProvider
                 'name'        => 'user-manager.verify',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    PhpMailerMiddleware::class,
+                    MailerMiddleware::class,
                     Handler\VerifyAccountHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],

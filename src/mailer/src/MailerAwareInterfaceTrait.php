@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mail;
+namespace Mailer;
 
 trait MailerAwareInterfaceTrait
 {
-    protected MailerInterface $mailerInterface;
+    protected MailerInterface&Mailer $mailerInterface;
 
-    public function setMailer(MailerInterface $mailerInterface): void
+    public function setMailer(MailerInterface&Mailer $mailerInterface): void
     {
         $this->mailerInterface = $mailerInterface;
     }
