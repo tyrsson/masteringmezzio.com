@@ -4,24 +4,32 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
+use Laminas\Filter;
+use Laminas\Form;
+use Laminas\Form\Element;
+use Laminas\Hydrator\ArraySerializableHydrator;
 use Htmx\HtmxAttributes as Htmx;
+use Htmx\Form\HtmxTrait;
 
-final class ResendVerification extends Register
+
+
+final class ResendVerification extends Form\Form
 {
+    use HtmxTrait;
+
     public function init(): void
     {
-        parent::init();
-        $this->setAttributes([
-            Htmx::HX_Post->value   => $this->urlHelper->generate('user-manager.verify'),
-            Htmx::HX_Target->value => '#app-main',
+        $this->add([
+            'name' => 'acct-data',
+            'type' => Fieldset\ResendVerification::class
         ]);
-        $fieldset = $this->getBaseFieldset();
-        $fieldset->remove('firstName')
-        ->remove('lastName')
-        ->remove('email')
-        ->remove('password')
-        ->remove('conf_password');
-        $submit = $this->get('Register');
-        $submit->setValue('Resend Verification');
+
+        $this->add([
+            'name'       => 'resend-verify',
+            'type'       => Form\Element\Submit::class,
+            'attributes' => [
+                'value' => 'Resend Verification',
+            ],
+        ]);
     }
 }

@@ -9,8 +9,8 @@ use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\InputFilter\InputFilter;
 use Laminas\Filter;
 use Laminas\Validator;
-use Webinertia\Filter\PasswordHash;
 use Webinertia\Filter\Uuid;
+use Webinertia\Validator\Password;
 
 class AcctDataFilter extends InputFilter implements AdapterAwareInterface
 {
@@ -120,7 +120,6 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                 'filters'  => [
                     ['name' => Filter\StripTags::class],
                     ['name' => Filter\StringTrim::class],
-                    ['name' => PasswordHash::class], // custom webinertia filter
                 ],
                 'validators' => [
                     [
@@ -130,7 +129,17 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                             'min'      => 1,
                             'max'      => 100,
                         ],
-                    ]
+                    ],
+                    [
+                        'name' => Password::class,
+                        'options' => [
+                            'length'  => 6, // overall length of password
+                            'upper'   => 1, // uppercase count
+                            'lower'   => 2, // lowercase count
+                            'digit'   => 2, // digit count
+                            'special' => 2, // special char count
+                        ],
+                    ],
                 ],
             ],
             [

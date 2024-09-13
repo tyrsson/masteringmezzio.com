@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace UserManager\Handler;
 
-use DateInterval;
-use DateTime;
-use DateTimeImmutable;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Htmx\HtmxAttributes as Htmx;
-use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mail\MailerInterface;
+use Mailer\Adapter\AdapterInterface;
+use Mailer\Adapter\PhpMailer;
+use Mailer\ConfigProvider as MailerConfigProvider;
+use Mailer\Mailer;
+use Mailer\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Helper\UrlHelper;
-use Mezzio\Router\RouteResult;
 use Mezzio\Template\TemplateRendererInterface;
-use PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception as MailException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ramsey\Uuid\Rfc4122\UuidV7;
+use UserManager\ConfigProvider;
 use UserManager\Form\ResendVerification;
 use UserManager\Helper\VerificationHelper;
 use UserManager\UserRepository\TableGateway;
@@ -32,6 +29,8 @@ class VerifyAccountHandler implements RequestHandlerInterface
 {
     public function __construct(
         private TemplateRendererInterface $renderer,
+        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private MailerInterface&Mailer $mailer,
         private VerificationHelper $verifyHelper,
         private ResendVerification $form,
         private UrlHelper $urlHelper,
@@ -79,6 +78,51 @@ class VerifyAccountHandler implements RequestHandlerInterface
 
     public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
-        // resend verification email with updated token
+        try {
+            $body = $request->getParsedBody();
+            $this->form->setData($body);
+            if ($this->form->isValid()) {
+                $userEntity = $this->form->getData();
+                $serverParams = $request->getServerParams();
+                $result = $this->userRepositoryInterface->save($userEntity, 'id');
+                $result = $this->userRepositoryInterface->findOneBy('id', $result->id);
+                /** @var Mailer */
+                $mailer = $request->getAttribute(MailerInterface::class);
+                /** @var PhpMailer */
+                $adapter = $mailer->getAdapter();
+                $mailConfig = $this->config[MailerConfigProvider::class][AdapterInterface::class] ?? null;
+                $adapter?->to(
+                    $result->email,
+                    $result->firstName . ' ' . $result->lastName
+                );
+                $adapter?->isHtml();
+                $adapter?->subject(
+                    sprintf(
+                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_SUBJECT],
+                        $this->config['app_settings']['app_name']
+                    )
+                );
+                $adapter?->body(
+                    sprintf(
+                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
+                        $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
+                        $this->urlHelper->generate(
+                            routeName: 'user-manager.verify',
+                            routeParams: [
+                                'id'    => $result->id,
+                                'token' => $result->verificationToken,
+                            ],
+                            options: ['reuse_query_params' => false]
+                        )
+                    )
+                );
+                $mailer?->send($adapter);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+        return new RedirectResponse(
+            $this->urlHelper->generate('home')
+        );
     }
 }

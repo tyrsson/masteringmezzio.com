@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6e0f8c7d17d488fc89c62528f8c7918",
+    "content-hash": "3fef47183edb5f37362e11c9e5c17242",
     "packages": [
         {
             "name": "axleus/axleus-db",
@@ -3549,6 +3549,72 @@
                 "source": "https://github.com/webinertia/webinertia-filter/tree/0.0.5"
             },
             "time": "2023-09-18T05:00:21+00:00"
+        },
+        {
+            "name": "webinertia/webinertia-validator",
+            "version": "0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webinertia/webinertia-validator.git",
+                "reference": "fe870c33d1fbad5fc2cc62f0fceaf16f52cd8491"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webinertia/webinertia-validator/zipball/fe870c33d1fbad5fc2cc62f0fceaf16f52cd8491",
+                "reference": "fe870c33d1fbad5fc2cc62f0fceaf16f52cd8491",
+                "shasum": ""
+            },
+            "require": {
+                "laminas/laminas-validator": "^2.32.0",
+                "php": "~8.1.0 || ~8.2.0"
+            },
+            "require-dev": {
+                "laminas/laminas-coding-standard": "^2.5",
+                "laminas/laminas-test": "^4.8",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.2",
+                "psalm/plugin-phpunit": "^0.18.4",
+                "slam/phpstan-laminas-framework": "^1.4"
+            },
+            "suggest": {
+                "laminas/laminas-component-installer": "^3.0, required for configuration injection"
+            },
+            "type": "library",
+            "extra": {
+                "laminas": {
+                    "component": "Webinertia\\Validator",
+                    "config-provider": "Webinertia\\Validator\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webinertia\\Validator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Joey Smith",
+                    "email": "jsmith@webinertia.net",
+                    "homepage": "https://webinertia.net/"
+                }
+            ],
+            "description": "Provides Validators for Webinertia components",
+            "homepage": "https://github.com/webinertia/webinertia-validator/discussions",
+            "keywords": [
+                "laminas",
+                "validator",
+                "webinertia"
+            ],
+            "support": {
+                "issues": "https://github.com/webinertia/webinertia-validator/issues",
+                "source": "https://github.com/webinertia/webinertia-validator/tree/0.0.4"
+            },
+            "time": "2023-09-18T05:27:25+00:00"
         },
         {
             "name": "webmozart/assert",

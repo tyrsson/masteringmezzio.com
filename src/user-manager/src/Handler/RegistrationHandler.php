@@ -10,6 +10,7 @@ use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mailer\Adapter\AdapterInterface;
 use Mailer\ConfigProvider as MailConfigProvider;
+use Mailer\Adapter\PhpMailer;
 use Mailer\Mailer;
 use Mailer\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
@@ -21,6 +22,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\ConfigProvider;
 use UserManager\Form\Register;
 use UserManager\UserRepository\TableGateway;
+use Webinertia\Filter\PasswordHash;
 
 use function sprintf;
 
@@ -61,10 +63,10 @@ class RegistrationHandler implements RequestHandlerInterface
         if ($this->form->isValid()) {
             $userEntity = $this->form->getData();
             $userEntity->offsetUnset('conf_password');
-
             try {
                 $serverParams = $request->getServerParams();
-                $result = $this->userRepositoryInterface->save($userEntity, 'id');
+                $userEntity->hashPassword();
+                $result       = $this->userRepositoryInterface->save($userEntity, 'id');
                 /** @var Mailer */
                 $mailer = $request->getAttribute(MailerInterface::class);
                 /** @var PhpMailer */
@@ -74,7 +76,7 @@ class RegistrationHandler implements RequestHandlerInterface
                     $result->email,
                     $result->firstName . ' ' . $result->lastName
                 );
-                $adapter?->isHTML();
+                $adapter?->isHtml();
                 $adapter?->subject(
                     sprintf(
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_SUBJECT],
@@ -96,14 +98,13 @@ class RegistrationHandler implements RequestHandlerInterface
                     )
                 );
                 $mailer?->send($adapter);
-            } catch (\Throwable) {
+            } catch (\Throwable $th) {
                 throw $th;
             }
             return new RedirectResponse(
                 $this->urlHelper->generate('home')
             );
         }
-
         return new HtmlResponse($this->renderer->render(
             'user-manager::registration',
             ['form' => $this->form] // parameters to pass to template

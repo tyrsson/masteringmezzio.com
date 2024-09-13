@@ -7,6 +7,7 @@ namespace UserManager\UserRepository;
 use ArrayObject;
 use Axleus\Db;
 use Mezzio\Authentication\UserInterface;
+use Webinertia\Filter\PasswordHash;
 
 final class UserEntity extends ArrayObject implements Db\EntityInterface, UserInterface
 {
@@ -62,6 +63,14 @@ final class UserEntity extends ArrayObject implements Db\EntityInterface, UserIn
 
     public function getPassword(): ?string
     {
+        return $this->offsetGet('password');
+    }
+
+    public function hashPassword(): string
+    {
+        $filter = new PasswordHash();
+        $this->offsetSet('password', $filter->filter($this->offsetGet('password')));
+        unset($filter);
         return $this->offsetGet('password');
     }
 }

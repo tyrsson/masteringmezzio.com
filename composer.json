@@ -61,7 +61,8 @@
         "mezzio/mezzio-session-ext": "^1.19",
         "phpmailer/phpmailer": "^6.9",
         "ramsey/uuid": "^4.7",
-        "webinertia/webinertia-filter": "^0.0.5"
+        "webinertia/webinertia-filter": "^0.0.5",
+        "webinertia/webinertia-validator": "^0.0.4"
     },
     "require-dev": {
         "axleus/axleus-dev-tools": "1.0.x-dev",

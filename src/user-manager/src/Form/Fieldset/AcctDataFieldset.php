@@ -13,7 +13,6 @@ use UserManager\UserRepository\UserEntity;
 
 final class AcctDataFieldset extends Fieldset implements InputFilterProviderInterface
 {
-
     public function init(): void
     {
         $this->setHydrator(new ArraySerializableHydrator());
