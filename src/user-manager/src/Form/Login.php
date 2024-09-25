@@ -6,13 +6,16 @@ namespace UserManager\Form;
 
 use Htmx\HtmxAttributes as Htmx;
 use Htmx\Form\HtmxTrait;
+use Laminas\Db\Adapter\AdapterAwareInterface;
+use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\Filter;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
 use Laminas\Form;
 
-final class Login extends Form\Form implements InputFilterProviderInterface
+final class Login extends Form\Form implements AdapterAwareInterface, InputFilterProviderInterface
 {
+    use AdapterAwareTrait;
     use HtmxTrait;
 
     protected $attributes = ['class' => 'login-form'];
@@ -26,8 +29,8 @@ final class Login extends Form\Form implements InputFilterProviderInterface
     public function init(): void
     {
         $this->setAttributes([
-            Htmx::HX_Post->value   => $this->urlHelper->generate('user-manager.login'),
-            Htmx::HX_Target->value => '#app-main'
+            'method' => 'POST',
+            'action' => $this->urlHelper->generate('user-manager.login')
         ]);
         $this->add([
             'name' => 'email',
@@ -68,6 +71,17 @@ final class Login extends Form\Form implements InputFilterProviderInterface
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                        ],
+                    ],
+                    [
+                        'name'    => Validator\Db\RecordExists::class,
+                        'options' => [
+                            'table'     => 'users',
+                            'field'     => 'email',
+                            'dbAdapter' => $this->adapter,
+                            'messages'  => [
+                                Validator\Db\RecordExists::ERROR_NO_RECORD_FOUND => 'Email not found!!',
+                            ],
                         ],
                     ],
                 ],

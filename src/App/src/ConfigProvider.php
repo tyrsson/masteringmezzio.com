@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
-use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 /**
@@ -15,6 +15,7 @@ use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
  */
 class ConfigProvider
 {
+    public final const APP_SETTINGS_KEY = 'app_settings';
     /**
      * Returns the configuration array
      *
@@ -25,8 +26,38 @@ class ConfigProvider
     {
         return [
             'dependencies'       => $this->getDependencies(),
+            'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'templates'          => $this->getTemplates(),
             'routes'             => $this->getRoutes(),
+            static::APP_SETTINGS_KEY => $this->getAppSettings(),
+        ];
+    }
+
+    public function getAppSettings(): array
+    {
+        return [];
+    }
+
+    public function getAuthorizationConfig(): array
+    {
+        return [
+            // 'roles'       => [
+            //     'Administrator' => [],
+            //     //'Editor'        => ['Administrator'],
+            //     //'Contributor'   => ['Editor'],
+            //     'User'          => ['Administrator'],
+            //     'Guest'         => ['User'],
+            // ],
+            'permissions' => [
+                'Guest' => [
+                    'home',
+                ],
+                'User'  => [
+                ],
+                'Administrator' => [
+                    'admin.dashboard.read',
+                ],
+            ],
         ];
     }
 
@@ -40,6 +71,7 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories'  => [
+                FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,
                 Middleware\AjaxRequestMiddleware::class => Middleware\AjaxRequestMiddlewareFactory::class,

@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Htmx\Middleware;
 
 use Htmx\RequestHeaders as Htmx;
+use Htmx\View\Model\FooterModel;
+use Htmx\View\Model\HeaderModel;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\ModelInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,13 +45,20 @@ class HtmxMiddleware implements MiddlewareInterface
                 false
             );
         }
-        if ($this->htmxConfig['htmx']['enable']) {
+        if ($this->htmxConfig['enable']) {
             $this->template->addDefaultParam(
                 TemplateRendererInterface::TEMPLATE_ALL,
                 'htmxConfig',
-                json_encode($this->htmxConfig['htmx']['config'])
+                json_encode($this->htmxConfig['config'])
             );
         }
+
+        // setup the Htmx ViewModel
+        $model = new ViewModel();
+        $model->addChild(new HeaderModel(['request' => $request]));
+        $model->addChild(new FooterModel());
+
+        $request = $request->withAttribute(ModelInterface::class, $model);
         return $handler->handle($request);
     }
 }

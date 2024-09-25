@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\Handler;
 
+use Laminas\Diactoros\Response\EmptyResponse;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Session\LazySession;

@@ -1,0 +1,67 @@
+<header id="app-header" class="container" style="margin-top:0; padding-top: 0;">
+    <nav id="nav">
+        <!-- Brand -->
+        <ul>
+            <li>
+                <a href="<?=$this->url('home')?>">
+                    <img src="<?=$this->basePath('front-end/images/mm7.png')?>" alt="Mastering Mezzio" width="300" />
+                </a>
+            </li>
+        </ul>
+        <ul>
+            <li>
+                <a href="https://github.com/tyrsson/masteringmezzio.com" target="_blank">
+                    <i class="bi-github"></i>
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/tyrsson/masteringmezzio.com/discussions" target="_blank">
+                    <i class="bi-envelope-fill"></i>
+                </a>
+            </li>
+        </ul>
+        <!-- Links -->
+        <ul>
+            <?php
+            if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
+            ?>
+            <li>
+                <a href="<?=$this->url('admin.dashboard')?>">
+                    Admin
+                </a>
+            </li>
+            <?php
+            endif;
+            ?>
+            <?php
+            if ($this->authz($this->request)->isGranted('user-manager.login')):
+            ?>
+            <li>
+                <a href="<?=$this->url('user-manager.login')?>">
+                    Sign In
+                </a>
+            </li>
+            <li>
+                <a href="<?=$this->url('user-manager.register')?>">
+                    Register
+                </a>
+            </li>
+            <?php
+            else:
+            ?>
+            <li>
+                <a href="<?=$this->url('user-manager.account')?>">
+                    Account
+                </a>
+            </li>
+            <li>
+                <a href="<?=$this->url('user-manager.logout')?>">
+                    Sign Out
+                </a>
+            </li>
+            <?php
+            endif;
+            ?>
+        </ul>
+    </nav>
+</header>

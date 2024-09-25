@@ -8,6 +8,7 @@ use Fig\Http\Message\RequestMethodInterface as Http;
 use Htmx\HtmxAttributes as Htmx;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\View\Model\ModelInterface;
 use Mailer\Adapter\AdapterInterface;
 use Mailer\Adapter\PhpMailer;
 use Mailer\ConfigProvider as MailerConfigProvider;
@@ -49,6 +50,8 @@ class VerifyAccountHandler implements RequestHandlerInterface
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         try {
+            $model = $request->getAttribute(ModelInterface::class);
+            $model->setVariable('form', $this->form);
             if (! $this->verifyHelper->verify($request)) {
                 /** @var UserEntity */
                 $target = $this->verifyHelper->getTarget();
@@ -57,20 +60,21 @@ class VerifyAccountHandler implements RequestHandlerInterface
                 // send form to resend email
                 $this->form->bind($target);
                 $this->form->setAttributes([
-                    Htmx::HX_Post->value => $this->urlHelper->generate(
+                    'action' => $this->urlHelper->generate(
                         routeName: 'user-manager.verify',
                         options: ['reuse_result_params' => false]
                     ),
-                    Htmx::HX_Target->value => '#app-main',
+                    'method' => Http::METHOD_POST,
                 ]);
                 return new HtmlResponse($this->renderer->render(
                     'user-manager::verify-account',
-                    ['form' => $this->form] // parameters to pass to template
+                    $model
                 ));
             }
         } catch (\Throwable $th) {
             throw $th;
         }
+        // todo: Add System Message to workflow for notification
         return new RedirectResponse(
             $this->urlHelper->generate('home')
         );

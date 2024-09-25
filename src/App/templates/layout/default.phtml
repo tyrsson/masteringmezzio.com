@@ -44,7 +44,6 @@ $this->inlineScript()
     ->appendFile($this->basePath('front-end/js/app.js'));
 ?>
 <?=$this->doctype();?>
-
 <html>
     <head>
         <base href="<?=$this->basePath('/');?>" />
@@ -53,84 +52,8 @@ $this->inlineScript()
         <?=$this->headLink()?>
         <?=$this->headScript()?>
     </head>
-    <body>
-        <header id="app-header" class="container" style="margin-top:0; padding-top: 0;">
-            <nav id="nav">
-                <!-- Brand -->
-                <ul>
-                    <li>
-                        <a href="<?=$this->url('home')?>" hx-get="<?=$this->url('home')?>" hx-target="#app-main">
-                            <img src="<?=$this->basePath('front-end/images/mm7.png')?>" alt="Mastering Mezzio" width="300" />
-                        </a>
-                    </li>
-                </ul>
-                <ul>
-                    <li>
-                        <a href="https://github.com/tyrsson/masteringmezzio.com" target="_blank">
-                            <i class="bi-github"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/tyrsson/masteringmezzio.com/discussions" target="_blank">
-                            <i class="bi-envelope-fill"></i>
-                        </a>
-                    </li>
-                </ul>
-                <!-- Links -->
-                <ul>
-                    <?php
-                    if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
-                    ?>
-                    <li>
-                        <a href="<?=$this->url('admin.dashboard')?>" hx-get="<?=$this->url('admin.dashboard')?>" hx-target="#app-main">
-                            Admin
-                        </a>
-                    </li>
-                    <?php
-                    endif;
-                    ?>
-                    <?php
-                    //if ($this->user->getIdentity() === 'guest'):
-                    if ($this->authz($this->request)->isGranted('user-manager.login')):
-                    ?>
-                    <li>
-                        <a href="<?=$this->url('user-manager.login')?>" hx-get="<?=$this->url('user-manager.login')?>" hx-target="#app-main">
-                            Sign In
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?=$this->url('user-manager.register')?>" hx-get="<?=$this->url('user-manager.register')?>" hx-target="#app-main">
-                            Register
-                        </a>
-                    </li>
-                    <?php
-                    else:
-                    ?>
-                    <li>
-                        <a href="<?=$this->url('user-manager.account')?>" hx-get="<?=$this->url('user-manager.account')?>" hx-target="#app-main">
-                            Account
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?=$this->url('user-manager.logout')?>">
-                            Sign Out
-                        </a>
-                    </li>
-                    <?php
-                    endif;
-                    ?>
-                </ul>
-            </nav>
-        </header>
-        <main id="app-main" class="container">
-            <?=$this->content?>
-        </main>
-        <footer id="app-footer" class="container">
-            <hr />
-            <p>
-                &copy; <?=date('Y')?> <a href="https://masteringmezzio.com/">Mastering Mezzio</a> All Rights Reserved.
-            </p>
-        </footer>
+    <body hx-boost="true" hx-push-url="true">
+        <?=$this->content?>
         <?=$this->inlineScript()?>
     </body>
 </html>

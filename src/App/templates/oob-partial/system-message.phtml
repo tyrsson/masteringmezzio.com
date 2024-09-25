@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+
+use Mezzio\Flash\FlashMessages;
+?>
+
+<dialog id="system-message" hx-target="body" hx-swap="beforeend" open>
+    <article>
+        <header>
+            <button id="system-message-close" aria-label="Close" rel="prev"></button>
+            <p>System Message:</p>
+        </header>
+        <p>
+            <?php
+                if (isset($this->messageKey) && $this->systemMessenger instanceof FlashMessages) {
+                    echo $this->systemMessenger->getFlash($this->messageKey);
+                }
+            ?>
+        </p>
+    </article>
+</dialog>

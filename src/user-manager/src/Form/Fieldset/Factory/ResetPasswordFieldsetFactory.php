@@ -13,6 +13,12 @@ final class ResetPasswordFieldsetFactory
 {
     public function __invoke(ContainerInterface $container): ResetPasswordFieldset
     {
-
+        $config = $container->get('config');
+        $fieldset = new ResetPasswordFieldset(
+            targetTable: $config[ConfigProvider::class][ConfigProvider::USERMANAGER_TABLE_NAME],
+            targetColumn: $config['authentication']['username']
+        );
+        $fieldset->setDbAdapter($container->get(AdapterInterface::class));
+        return $fieldset;
     }
 }

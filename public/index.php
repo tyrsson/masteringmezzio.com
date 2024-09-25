@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Laminas\Db\Adapter\AdapterInterface;
+
 // Delegate static file requests back to the PHP built-in webserver
 if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
     return false;
@@ -14,17 +16,22 @@ require 'vendor/autoload.php';
  * Self-called anonymous function that creates its own scope and keeps the global namespace clean.
  */
 (function () {
-
-    if (file_exists('config/development.config.php') && class_exists(\Tracy\Debugger::class)) {
+    $showDebug = false;
+    $adapter   = null;
+    if (file_exists('config/development.config.php') && class_exists(\Debug\Clock::class)) {
         $debugConfig = require 'config/development.config.php';
+
         if ($debugConfig['debug']) {
-            \Tracy\Debugger::enable();
-            \Tracy\Debugger::timer('total-runtime');
+            $showDebug = true;
+            \Debug\Clock::timer('total-runtime');
         }
     }
 
     /** @var \Psr\Container\ContainerInterface $container */
     $container = require 'config/container.php';
+    if ($showDebug) {
+        $adapter = $container->get(AdapterInterface::class);
+    }
 
     /** @var \Mezzio\Application $app */
     $app = $container->get(\Mezzio\Application::class);
@@ -35,5 +42,8 @@ require 'vendor/autoload.php';
     (require 'config/pipeline.php')($app, $factory, $container);
 
     $app->run();
-
+    if ($showDebug) {
+        echo \Debug\Clock::timer('total-runtime');
+        echo \Debug\Clock::queryProfiles($adapter);
+    }
 })();

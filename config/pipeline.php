@@ -10,6 +10,7 @@ use Htmx\Middleware\HtmxMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Application;
 use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Handler\NotFoundHandler;
 use Mezzio\Helper\ServerUrlMiddleware;
 use Mezzio\Helper\UrlHelperMiddleware;
@@ -30,9 +31,6 @@ use UserManager\Middleware\IdentityMiddleware;
 return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
     // The error handler should be the first (most outer) middleware to catch
     // all Exceptions.
-    if (class_exists(\Axleus\DevTools\Middleware\TracyDebuggerMiddleware::class, true)) {
-        $app->pipe(\Axleus\DevTools\Middleware\TracyDebuggerMiddleware::class);
-    }
     $app->pipe(ErrorHandler::class);
     $app->pipe(ServerUrlMiddleware::class);
 
@@ -54,13 +52,15 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - $app->pipe('/docs', $apiDocMiddleware);
     // - $app->pipe('/files', $filesMiddleware);
     $app->pipe(SessionMiddleware::class);
+    $app->pipe(FlashMessageMiddleware::class);
     $app->pipe(IdentityMiddleware::class);
-    $app->pipe(AjaxRequestMiddleware::class);
-    $app->pipe(HtmxMiddleware::class);
+    $app->pipe(AjaxRequestMiddleware::class); // possible rmeoval
 
     // Register the routing middleware in the middleware pipeline.
     // This middleware registers the Mezzio\Router\RouteResult request attribute.
     $app->pipe(RouteMiddleware::class);
+
+    $app->pipe(HtmxMiddleware::class);
 
     // The following handle routing failures for common conditions:
     // - HEAD request but no routes answer that method
@@ -85,10 +85,6 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - route-based validation
     // - etc.
     $app->pipe(TemplateMiddleware::class);
-
-    if (class_exists(\Axleus\DevTools\Middleware\RequestPanelMiddleware::class)) {
-        $app->pipe(\Axleus\DevTools\Middleware\RequestPanelMiddleware::class);
-    }
 
     // Register the dispatch middleware in the middleware pipeline
     $app->pipe(DispatchMiddleware::class);

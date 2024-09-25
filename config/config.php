@@ -14,6 +14,7 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
+    \Mezzio\Flash\ConfigProvider::class,
     \Webinertia\Validator\ConfigProvider::class,
     \Mailer\ConfigProvider::class,
     \Mezzio\Authorization\Rbac\ConfigProvider::class,
@@ -56,8 +57,8 @@ $aggregator = new ConfigAggregator([
     /**
      * If DevTools is present load the provider
      */
-    class_exists(\Axleus\DevTools\ConfigProvider::class)
-        ? \Axleus\DevTools\ConfigProvider::class
+    class_exists(\Debug\ConfigProvider::class)
+        ? \Debug\ConfigProvider::class
         : function(): array {
             return [];
         },

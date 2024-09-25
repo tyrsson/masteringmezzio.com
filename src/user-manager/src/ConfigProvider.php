@@ -18,6 +18,7 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
+use Webinertia\Validator\Password;
 
 final class ConfigProvider
 {
@@ -56,6 +57,15 @@ final class ConfigProvider
     {
         return [
             'account_verification_token_expire_time' => '1 Hour',
+            Password::class => [
+                'options' => [
+                    'length'  => 8, // overall length of password
+                    'upper'   => 1, // uppercase count
+                    'lower'   => 2, // lowercase count
+                    'digit'   => 2, // digit count
+                    'special' => 2, // special char count
+                ],
+            ],
         ];
     }
 
@@ -83,6 +93,8 @@ final class ConfigProvider
                     'home',
                     'user-manager.login',
                     'user-manager.register',
+                    'user-manager.reset',
+                    'user-manager.password',
                     'user-manager.verify',
                 ],
                 'User'  => [
@@ -114,6 +126,7 @@ final class ConfigProvider
                 Authz\Rbac::class                    => Authz\RbacFactory::class,
                 Authz\UserAssertion::class           => InvokableFactory::class,
                 Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
+                Handler\ChangePasswordHandler::class => Handler\ChangePasswordHandlerFactory::class,
                 Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
                 Handler\RegistrationHandler::class   => Handler\RegistrationHandlerFactory::class,
@@ -139,11 +152,13 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Form\Fieldset\AcctDataFieldset::class   => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
-                Form\Fieldset\ResendVerification::class => InvokableFactory::class,
-                Form\Login::class                       => Form\LoginFactory::class,
-                Form\Register::class                    => Form\RegisterFactory::class,
-                Form\ResendVerification::class          => Form\ResendVerificationFactory::class,
+                Form\Fieldset\AcctDataFieldset::class      => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\Fieldset\ResendVerification::class    => InvokableFactory::class,
+                Form\Login::class                          => Form\LoginFactory::class,
+                Form\Register::class                       => Form\RegisterFactory::class,
+                Form\ResendVerification::class             => Form\ResendVerificationFactory::class,
+                Form\ResetPassword::class                  => Form\ResetPasswordFactory::class,
+                Form\Fieldset\ResetPasswordFieldset::class => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
             ],
         ];
     }
@@ -209,6 +224,16 @@ final class ConfigProvider
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
+                'path'        => '/user-manager/reset[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'        => 'user-manager.reset',
+                'middleware'  => [
+                    BodyParamsMiddleware::class,
+                    MailerMiddleware::class,
+                    Handler\ResetPasswordHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
                 'path'        => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
                 'name'        => 'user-manager.verify',
                 'middleware'  => [
@@ -217,6 +242,15 @@ final class ConfigProvider
                     Handler\VerifyAccountHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
+                'path'        => '/user-manager/validate/email',
+                'name'        => 'user-manager.validate.email',
+                'middleware'  => [
+                    AuthorizationMiddleware::class,
+                    Handler\EmailValidationHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET],
             ],
             [
                 'path'        => '/user-manager/account',

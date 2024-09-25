@@ -19,6 +19,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
     public function __construct(
         private string $targetTable,
         private string $targetColumn,
+        private array $passwordConfig
     ) {
     }
 
@@ -133,11 +134,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                     [
                         'name' => Password::class,
                         'options' => [
-                            'length'  => 6, // overall length of password
-                            'upper'   => 1, // uppercase count
-                            'lower'   => 2, // lowercase count
-                            'digit'   => 2, // digit count
-                            'special' => 2, // special char count
+                            $this->passwordConfig
                         ],
                     ],
                 ],
