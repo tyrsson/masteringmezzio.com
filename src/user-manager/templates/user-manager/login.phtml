@@ -12,12 +12,12 @@ $this->headTitle(ucfirst($this->currentRoute));
                 <article>
                 <?php
                     if (isset($this->form)) {
-                        $this->form->setAttribute('action', $this->url('user-manager.login'));
+                        $this->form->setAttribute('action', $this->url('Login'));
                         echo $this->form($this->form);
                     }
                 ?>
             <span>Forgot your password?
-                    <a href="<?=$this->url('user-manager.reset');?>">Reset Password</a>
+                    <a href="<?=$this->url('Reset Password');?>">Reset Password</a>
                 </span>
                 </article>
             </div>

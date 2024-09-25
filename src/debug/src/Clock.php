@@ -47,7 +47,7 @@ class Clock implements ClockInterface
             Dumper::dump(
                 [
                     'sql' => $sql,
-                    'elapsed-time' => number_format($elapse / 1000, 5, '.', "\u{202f}") . ' ms',
+                    'elapsed-time' => number_format($elapse * 1000, 5, '.', "\u{202f}") . ' ms',
                 ],
                 'Query Profile:'
             );

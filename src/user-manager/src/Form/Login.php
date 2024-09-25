@@ -30,7 +30,7 @@ final class Login extends Form\Form implements AdapterAwareInterface, InputFilte
     {
         $this->setAttributes([
             'method' => 'POST',
-            'action' => $this->urlHelper->generate('user-manager.login')
+            'action' => $this->urlHelper->generate('Login')
         ]);
         $this->add([
             'name' => 'email',

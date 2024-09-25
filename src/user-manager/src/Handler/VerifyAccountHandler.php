@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace UserManager\Handler;
 
+use App\HandlerTrait;
 use Fig\Http\Message\RequestMethodInterface as Http;
-use Htmx\HtmxAttributes as Htmx;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\View\Model\ModelInterface;
@@ -28,6 +28,8 @@ use UserManager\UserRepository\UserEntity;
 
 class VerifyAccountHandler implements RequestHandlerInterface
 {
+    use HandlerTrait;
+
     public function __construct(
         private TemplateRendererInterface $renderer,
         private UserRepositoryInterface&TableGateway $userRepositoryInterface,
@@ -39,13 +41,6 @@ class VerifyAccountHandler implements RequestHandlerInterface
     ) {
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        return match ($request->getMethod()) {
-            Http::METHOD_GET => $this->handleGet($request),
-            default => $this->handlePost($request)
-        };
-    }
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
@@ -61,7 +56,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
                 $this->form->bind($target);
                 $this->form->setAttributes([
                     'action' => $this->urlHelper->generate(
-                        routeName: 'user-manager.verify',
+                        routeName: 'Verify Account',
                         options: ['reuse_result_params' => false]
                     ),
                     'method' => Http::METHOD_POST,
@@ -76,7 +71,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
         }
         // todo: Add System Message to workflow for notification
         return new RedirectResponse(
-            $this->urlHelper->generate('home')
+            $this->urlHelper->generate('Home')
         );
     }
 
@@ -111,7 +106,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
                         $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
                         $this->urlHelper->generate(
-                            routeName: 'user-manager.verify',
+                            routeName: 'Verify Account',
                             routeParams: [
                                 'id'    => $result->id,
                                 'token' => $result->verificationToken,
@@ -126,7 +121,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
             throw $th;
         }
         return new RedirectResponse(
-            $this->urlHelper->generate('home')
+            $this->urlHelper->generate('Home')
         );
     }
 }

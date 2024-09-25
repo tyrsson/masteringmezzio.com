@@ -6,7 +6,6 @@ namespace Htmx;
 
 use Laminas\Form\View\Helper\Form as LaminasFormHelper;
 use Laminas\ServiceManager\Factory\InvokableFactory;
-use Laminas\View\Helper\Url as BaseUrlHelper;
 
 final class ConfigProvider
 {
@@ -17,7 +16,6 @@ final class ConfigProvider
             'view_helpers'       => $this->getViewHelpers(),
             'view_helper_config' => $this->getViewHelperConfig(),
             'htmx_config'        => $this->getHtmxConfig(),
-            'templates'          => $this->getTemplates(),
         ];
     }
 
@@ -59,8 +57,9 @@ final class ConfigProvider
     public function getHtmxConfig(): array
     {
         return [
-            'enable' => true,
-            'config' => [
+            'enable'   => true,
+            'app_name' => 'Mastering Mezzio',
+            'config'   => [
                 'historyEnabled'          => true,
                 'historyCacheSize'        => 10,
                 'refreshOnHistoryMiss'    => false,
@@ -92,15 +91,6 @@ final class ConfigProvider
                 'scrollIntoViewOnBoost'   => true,
                 'triggerSpecsCache'       => null,
                 'allowNestedOobSwaps'     => true,
-            ],
-        ];
-    }
-
-    public function getTemplates(): array
-    {
-        return [
-            'paths' => [
-                'htmx' => [__DIR__ . '/../templates/htmx'],
             ],
         ];
     }

@@ -25,22 +25,22 @@ trait HandlerTrait
         };
     }
 
-    private function handleDelete(ServerRequestInterface $request): ResponseInterface
+    public function handleDelete(ServerRequestInterface $request): ResponseInterface
     {
         return new EmptyResponse(405);
     }
 
-    private function handleGet(ServerRequestInterface $request): ResponseInterface
+    public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         return new EmptyResponse(405);
     }
 
-    private function handlePost(ServerRequestInterface $request): ResponseInterface
+    public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
         return new EmptyResponse(405);
     }
 
-    private function handlePut(ServerRequestInterface $request): ResponseInterface
+    public function handlePut(ServerRequestInterface $request): ResponseInterface
     {
         return new EmptyResponse(405);
     }

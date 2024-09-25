@@ -20,8 +20,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use function in_array;
-
 class LoginHandler implements RequestHandlerInterface
 {
     private const REDIRECT_ATTRIBUTE = 'authentication:redirect';
@@ -48,17 +46,9 @@ class LoginHandler implements RequestHandlerInterface
             Http::METHOD_POST   => $this->handlePost($request, $session, $redirect),
             default => new EmptyResponse(405), // defaults to a method not allowed
         };
-
-        // Display initial login form
-        $session->set(self::REDIRECT_ATTRIBUTE, $redirect);
-
-        // Render and return a response:
-        return new HtmlResponse($this->renderer->render(
-            'user-manager::login',
-        ));
     }
 
-    private function handlePost(
+    public function handlePost(
         ServerRequestInterface $request,
         SessionInterface $session,
         string $redirect
@@ -85,7 +75,7 @@ class LoginHandler implements RequestHandlerInterface
         }
     }
 
-    protected function handleGet(ServerRequestInterface $request): ResponseInterface
+    public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         $model = $request->getAttribute(ModelInterface::class);
         $model->setVariable('form', $this->form);

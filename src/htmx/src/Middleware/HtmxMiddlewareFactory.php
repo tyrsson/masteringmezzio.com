@@ -11,9 +11,10 @@ class HtmxMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container) : HtmxMiddleware
     {
+        $config = $container->get('config');
         return new HtmxMiddleware(
             $container->get(TemplateRendererInterface::class),
-            $container->get('config')['htmx_config']
+            $config['htmx_config']
         );
     }
 }

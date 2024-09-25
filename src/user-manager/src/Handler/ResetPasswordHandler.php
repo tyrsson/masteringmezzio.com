@@ -33,7 +33,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
     ) {
     }
 
-    private function handleGet(ServerRequestInterface $request): ResponseInterface
+    public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         $model = $request->getAttribute(ModelInterface::class);
         $model->setVariable('form', $this->form);
@@ -45,7 +45,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
         );
     }
 
-    private function handlePost(ServerRequestInterface $request): ResponseInterface
+    public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
         $body = $request->getParsedBody();
         $this->form->setData($body);
@@ -65,15 +65,5 @@ class ResetPasswordHandler implements RequestHandlerInterface
                 $model
             )
         );
-    }
-
-    private function handlePut(ServerRequestInterface $request): ResponseInterface
-    {
-
-    }
-
-    private function handleDelete(ServerRequestInterface $request): ResponseInterface
-    {
-
     }
 }

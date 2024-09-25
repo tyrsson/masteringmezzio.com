@@ -9,15 +9,18 @@ use Htmx\View\Model\FooterModel;
 use Htmx\View\Model\HeaderModel;
 use Laminas\View\Model\ViewModel;
 use Laminas\View\Model\ModelInterface;
+use Mezzio\Router\RouteResult;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use const JSON_PRETTY_PRINT;
-
+use function count;
+use function explode;
 use function json_encode;
+use function str_contains;
+use function ucfirst;
 
 class HtmxMiddleware implements MiddlewareInterface
 {
@@ -53,9 +56,30 @@ class HtmxMiddleware implements MiddlewareInterface
             );
         }
 
+        /** @var RouteResult */
+        $routeResult = $request->getAttribute(RouteResult::class);
+        if ($routeResult->isSuccess()) {
+            $routeName = $routeResult->getMatchedRouteName() ?? '';
+        }
+        // $parts = [];
+        // if (str_contains($routeName, '.')) {
+        //     $parts = explode('.', $routeName);
+        // } else {
+        //     $parts[1] = $routeName;
+        // }
+        // $count = count($parts);
         // setup the Htmx ViewModel
         $model = new ViewModel();
-        $model->addChild(new HeaderModel(['request' => $request]));
+        $model->addChild(
+            new HeaderModel(
+                [
+                    'request' => $request,
+                    'appName' => $this->htmxConfig['app_name'],
+                    'title'   => $routeName
+                    //'title'   => ($count === 1 ? ucfirst($parts[1]) : ucfirst($parts[0])) . ' ' . ($count > 1 ? ucfirst($parts[1]) : ucfirst($parts[2])),
+                ]
+            )
+        );
         $model->addChild(new FooterModel());
 
         $request = $request->withAttribute(ModelInterface::class, $model);

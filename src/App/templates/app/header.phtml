@@ -1,9 +1,15 @@
+<?php
+declare(strict_types=1);
+
+$this->headTitle($this->appName)->setSeparator(' - ')->setAutoEscape(false)
+?>
+<?=$this->headTitle($this->title);?>
 <header id="app-header" class="container" style="margin-top:0; padding-top: 0;">
     <nav id="nav">
         <!-- Brand -->
         <ul>
             <li>
-                <a href="<?=$this->url('home')?>">
+                <a href="<?=$this->url('Home')?>">
                     <img src="<?=$this->basePath('front-end/images/mm7.png')?>" alt="Mastering Mezzio" width="300" />
                 </a>
             </li>
@@ -23,10 +29,10 @@
         <!-- Links -->
         <ul>
             <?php
-            if ($this->authz($this->request)->isGranted('admin.dashboard.read')):
+            if ($this->authz($this->request)->isGranted('Admin Dashboard.read')):
             ?>
             <li>
-                <a href="<?=$this->url('admin.dashboard')?>">
+                <a href="<?=$this->url('Admin Dashboard')?>">
                     Admin
                 </a>
             </li>
@@ -34,15 +40,15 @@
             endif;
             ?>
             <?php
-            if ($this->authz($this->request)->isGranted('user-manager.login')):
+            if ($this->authz($this->request)->isGranted('Login')):
             ?>
             <li>
-                <a href="<?=$this->url('user-manager.login')?>">
+                <a href="<?=$this->url('Login')?>">
                     Sign In
                 </a>
             </li>
             <li>
-                <a href="<?=$this->url('user-manager.register')?>">
+                <a href="<?=$this->url('Register')?>">
                     Register
                 </a>
             </li>
@@ -50,12 +56,12 @@
             else:
             ?>
             <li>
-                <a href="<?=$this->url('user-manager.account')?>">
+                <a href="<?=$this->url('Account')?>">
                     Account
                 </a>
             </li>
             <li>
-                <a href="<?=$this->url('user-manager.logout')?>">
+                <a href="<?=$this->url('Logout')?>">
                     Sign Out
                 </a>
             </li>

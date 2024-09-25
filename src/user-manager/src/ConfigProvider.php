@@ -90,19 +90,17 @@ final class ConfigProvider
             ],
             'permissions' => [
                 'Guest' => [
-                    'home',
-                    'user-manager.login',
-                    'user-manager.register',
-                    'user-manager.reset',
-                    'user-manager.password',
-                    'user-manager.verify',
+                    'Home',
+                    'Login',
+                    'Register',
+                    'Reset Password',
+                    'Verify Account',
                 ],
                 'User'  => [
-                    'user-manager.logout',
-                    'user-manager.account.read',
+                    'Logout',
+                    'Account.read',
                 ],
                 'Administrator' => [
-                    'admin.dashboard.read',
                 ],
             ],
         ];
@@ -187,7 +185,7 @@ final class ConfigProvider
     public function getRbacMappedRoutes(): array
     {
         return [
-            'user-manager.account', 'admin.dashboard'
+            'Account',
         ];
     }
 
@@ -196,7 +194,7 @@ final class ConfigProvider
         return [
             [
                 'path'       => '/user-manager/login',
-                'name'       => 'user-manager.login', // todo: update name to use um prefix
+                'name'       => 'Login', // todo: update name to use um prefix
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
@@ -206,7 +204,7 @@ final class ConfigProvider
             ],
             [
                 'path'       => '/user-manager/logout',
-                'name'       => 'user-manager.logout',
+                'name'       => 'Logout',
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
@@ -215,7 +213,7 @@ final class ConfigProvider
             ],
             [
                 'path'        => '/user-manager/register',
-                'name'        => 'user-manager.register',
+                'name'        => 'Register',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
@@ -225,7 +223,7 @@ final class ConfigProvider
             ],
             [
                 'path'        => '/user-manager/reset[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
-                'name'        => 'user-manager.reset',
+                'name'        => 'Reset Password',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
@@ -235,7 +233,7 @@ final class ConfigProvider
             ],
             [
                 'path'        => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
-                'name'        => 'user-manager.verify',
+                'name'        => 'Verify Account',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
@@ -244,17 +242,8 @@ final class ConfigProvider
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/validate/email',
-                'name'        => 'user-manager.validate.email',
-                'middleware'  => [
-                    AuthorizationMiddleware::class,
-                    Handler\EmailValidationHandler::class,
-                ],
-                'allowed_methods' => [Http::METHOD_GET],
-            ],
-            [
                 'path'        => '/user-manager/account',
-                'name'        => 'user-manager.account',
+                'name'        => 'Account',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     AuthorizationMiddleware::class,

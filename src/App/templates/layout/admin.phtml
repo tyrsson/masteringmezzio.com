@@ -56,7 +56,7 @@ $this->headScript()
                 <!-- Brand -->
                 <ul>
                     <li>
-                        <a href="<?=$this->url('home')?>">
+                        <a href="<?=$this->url('Home')?>">
                             <img src="https://docs.laminas.dev/img/laminas-mezzio-rgb.svg" alt="Laminas Mezzio" width="300" />
                         </a>
                     </li>
@@ -93,12 +93,12 @@ $this->headScript()
                     if ($this->user->getIdentity() === 'guest'):
                     ?>
                     <li>
-                        <a href="<?=$this->url('user-manager.login')?>">
+                        <a href="<?=$this->url('Login')?>">
                             Sign In
                         </a>
                     </li>
                     <li>
-                        <a href="<?=$this->url('user-manager.register')?>">
+                        <a href="<?=$this->url('Register')?>">
                             Register
                         </a>
                     </li>
@@ -111,7 +111,7 @@ $this->headScript()
                         </a>
                     </li>
                     <li>
-                        <a href="<?=$this->url('user-manager.logout')?>">
+                        <a href="<?=$this->url('Logout')?>">
                             Sign Out
                         </a>
                     </li>

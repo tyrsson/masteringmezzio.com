@@ -41,7 +41,7 @@ class RegistrationHandler implements RequestHandlerInterface
     ) {
     }
 
-    private function handleGet(ServerRequestInterface $request): ResponseInterface
+    public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         $model = $request->getAttribute(ModelInterface::class);
         $model->setVariable('form', $this->form);
@@ -51,7 +51,7 @@ class RegistrationHandler implements RequestHandlerInterface
         ));
     }
 
-    private function handlePost(ServerRequestInterface $request): ResponseInterface
+    public function handlePost(ServerRequestInterface $request): ResponseInterface
     {
         $model = $request->getAttribute(ModelInterface::class);
         $model->setVariable('form', $this->form);
@@ -85,7 +85,7 @@ class RegistrationHandler implements RequestHandlerInterface
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
                         $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
                         $this->urlHelper->generate(
-                            routeName: 'user-manager.verify',
+                            routeName: 'Verify Account',
                             routeParams: [
                                 'id'    => $result->id,
                                 'token' => $result->verificationToken,
@@ -99,7 +99,7 @@ class RegistrationHandler implements RequestHandlerInterface
                 throw $th;
             }
             return new RedirectResponse(
-                $this->urlHelper->generate('home')
+                $this->urlHelper->generate('Home')
             );
         }
         return new HtmlResponse($this->renderer->render(

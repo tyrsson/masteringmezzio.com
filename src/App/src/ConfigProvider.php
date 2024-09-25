@@ -25,11 +25,14 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'dependencies'       => $this->getDependencies(),
+            'dependencies'              => $this->getDependencies(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
-            'templates'          => $this->getTemplates(),
-            'routes'             => $this->getRoutes(),
-            static::APP_SETTINGS_KEY => $this->getAppSettings(),
+            'templates'                 => $this->getTemplates(),
+            'routes'                    => $this->getRoutes(),
+            static::APP_SETTINGS_KEY    => $this->getAppSettings(),
+            \UserManager\ConfigProvider::class => [
+                \UserManager\ConfigProvider::RBAC_MAPPED_ROUTES => $this->getRbacMappedRoutes(),
+            ]
         ];
     }
 
@@ -50,14 +53,21 @@ class ConfigProvider
             // ],
             'permissions' => [
                 'Guest' => [
-                    'home',
+                    'Home',
                 ],
                 'User'  => [
                 ],
                 'Administrator' => [
-                    'admin.dashboard.read',
+                    'Admin Dashboard.read',
                 ],
             ],
+        ];
+    }
+
+    public function getRbacMappedRoutes(): array
+    {
+        return [
+            'Admin Dashboard'
         ];
     }
 
@@ -85,7 +95,7 @@ class ConfigProvider
         return [
             [
                 'path' => '/',
-                'name' => 'home',
+                'name' => 'Home',
                 'middleware' => [
                     Handler\HomePageHandler::class,
                 ],
@@ -93,7 +103,7 @@ class ConfigProvider
             ],
             [
                 'path' => '/admin',
-                'name' => 'admin.dashboard',
+                'name' => 'Admin Dashboard',
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,

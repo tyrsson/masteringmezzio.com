@@ -133,9 +133,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                     ],
                     [
                         'name' => Password::class,
-                        'options' => [
-                            $this->passwordConfig
-                        ],
+                        'options' => $this->passwordConfig,
                     ],
                 ],
             ],

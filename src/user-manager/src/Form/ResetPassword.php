@@ -23,7 +23,7 @@ final class ResetPassword extends Form\Form
     public function init(): void
     {
         $this->setAttributes([
-            'action' => $this->urlHelper->generate('user-manager.reset'),
+            'action' => $this->urlHelper->generate('Reset Password'),
             'method' => Http::METHOD_POST,
         ]);
 

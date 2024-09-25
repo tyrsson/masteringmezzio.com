@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
-use Laminas\Filter;
 use Laminas\Form;
-use Laminas\Form\Element;
-use Laminas\Hydrator\ArraySerializableHydrator;
-use Htmx\HtmxAttributes as Htmx;
 use Htmx\Form\HtmxTrait;
 
 
