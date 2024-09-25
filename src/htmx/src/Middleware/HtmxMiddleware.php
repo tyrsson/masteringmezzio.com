@@ -48,6 +48,7 @@ class HtmxMiddleware implements MiddlewareInterface
                 false
             );
         }
+
         if ($this->htmxConfig['enable']) {
             $this->template->addDefaultParam(
                 TemplateRendererInterface::TEMPLATE_ALL,
@@ -61,13 +62,7 @@ class HtmxMiddleware implements MiddlewareInterface
         if ($routeResult->isSuccess()) {
             $routeName = $routeResult->getMatchedRouteName() ?? '';
         }
-        // $parts = [];
-        // if (str_contains($routeName, '.')) {
-        //     $parts = explode('.', $routeName);
-        // } else {
-        //     $parts[1] = $routeName;
-        // }
-        // $count = count($parts);
+
         // setup the Htmx ViewModel
         $model = new ViewModel();
         $model->addChild(
@@ -75,13 +70,12 @@ class HtmxMiddleware implements MiddlewareInterface
                 [
                     'request' => $request,
                     'appName' => $this->htmxConfig['app_name'],
-                    'title'   => $routeName
-                    //'title'   => ($count === 1 ? ucfirst($parts[1]) : ucfirst($parts[0])) . ' ' . ($count > 1 ? ucfirst($parts[1]) : ucfirst($parts[2])),
+                    'title'   => $routeName,
                 ]
             )
         );
-        $model->addChild(new FooterModel());
 
+        $model->addChild(new FooterModel());
         $request = $request->withAttribute(ModelInterface::class, $model);
         return $handler->handle($request);
     }
