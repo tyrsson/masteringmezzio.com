@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace UserManager\Handler;
 
+use Laminas\Form\FormElementManager;
+use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
+use UserManager\Form\ResetPassword;
 
 class ResetPasswordHandlerFactory
 {
     public function __invoke(ContainerInterface $container) : ResetPasswordHandler
     {
-        return new ResetPasswordHandler($container->get(TemplateRendererInterface::class));
+        $manager = $container->get(FormElementManager::class);
+        return new ResetPasswordHandler(
+            $container->get(TemplateRendererInterface::class),
+            $container->get(UserRepositoryInterface::class),
+            $container->get(UrlHelper::class),
+            $manager->get(ResetPassword::class),
+            $container->get('config')
+        );
     }
 }

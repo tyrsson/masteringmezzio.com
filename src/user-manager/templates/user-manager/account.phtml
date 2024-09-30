@@ -1,7 +1,16 @@
-Template for UserManager\Handler\AccountHandler
 <?php
-if ($this->swapNav && isset($this->request)) {
-    $this->partial()->setObjectKey('request');
-    echo $this->partial('app-oob-partial::nav', $this->request);
-}
+declare(strict_types=1);
 ?>
+<?=$this->header?>
+<main id="app-main" class="container">
+    <div class="row center-xs">
+        <div class="col-xs-10">
+            <div class="box">
+                <article>
+                    <p>Template for UserManager\Handler\AccountHandler</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</main>
+<?=$this->footer?>

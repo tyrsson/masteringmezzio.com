@@ -56,15 +56,17 @@
         "mezzio/mezzio-authentication-session": "^1.9",
         "mezzio/mezzio-authorization-rbac": "^1.7",
         "mezzio/mezzio-fastroute": "^3.11.0",
+        "mezzio/mezzio-flash": "^1.8",
         "mezzio/mezzio-helpers": "^5.7",
         "mezzio/mezzio-laminasviewrenderer": "^2.15",
         "mezzio/mezzio-session-ext": "^1.19",
         "phpmailer/phpmailer": "^6.9",
+        "psr/clock": "^1.0",
         "ramsey/uuid": "^4.7",
-        "webinertia/webinertia-filter": "^0.0.5"
+        "webinertia/webinertia-filter": "^0.0.5",
+        "webinertia/webinertia-validator": "^0.0.4"
     },
     "require-dev": {
-        "axleus/axleus-dev-tools": "1.0.x-dev",
         "filp/whoops": "^2.15.4",
         "laminas/laminas-coding-standard": "~2.5.0",
         "laminas/laminas-development-mode": "^3.12.0",
@@ -77,10 +79,11 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/App/src/",
+            "Debug\\": "src/debug/src/",
             "Htmx\\": "src/htmx/src",
             "UserManager\\": "src/user-manager/src/",
             "Pico\\": "src/pico/src/",
-            "Mail\\": "src/mail/src/"
+            "Mailer\\": "src/mailer/src/"
         }
     },
     "autoload-dev": {

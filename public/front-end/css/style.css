@@ -6,3 +6,21 @@ body {
 #app-main {
     flex: 1;
 }
+article {
+    height: 95%;
+}
+dialog > article {
+    height:auto;
+}
+a:link {
+    text-decoration: none;
+}
+a:visted {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: none;
+}
+a:active {
+    text-decoration: none;
+}

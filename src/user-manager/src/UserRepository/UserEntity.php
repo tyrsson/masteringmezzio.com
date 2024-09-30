@@ -7,6 +7,8 @@ namespace UserManager\UserRepository;
 use ArrayObject;
 use Axleus\Db;
 use Mezzio\Authentication\UserInterface;
+use Ramsey\Uuid\Lazy\LazyUuidFromString;
+use Webinertia\Filter\PasswordHash;
 
 final class UserEntity extends ArrayObject implements Db\EntityInterface, UserInterface
 {
@@ -35,9 +37,10 @@ final class UserEntity extends ArrayObject implements Db\EntityInterface, UserIn
         return $this->getArrayCopy();
     }
 
-    public function setId(int $id): void
+    public function setId(int $id): self
     {
         $this->offsetSet('id', $id);
+        return $this;
     }
 
     public function getId(): ?int
@@ -45,9 +48,10 @@ final class UserEntity extends ArrayObject implements Db\EntityInterface, UserIn
         return $this->offsetGet('id');
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $email): self
     {
         $this->offsetSet('email', $email);
+        return $this;
     }
 
     public function getEmail(): string
@@ -55,13 +59,33 @@ final class UserEntity extends ArrayObject implements Db\EntityInterface, UserIn
         return $this->offsetGet('email');
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(string $password): self
     {
         $this->offsetSet('password', $password);
+        return $this;
     }
 
     public function getPassword(): ?string
     {
+        return $this->offsetGet('password');
+    }
+
+    public function setToken(LazyUuidFromString|string $token): self
+    {
+        $this->offsetSet('verificationToken', $token);
+        return $this;
+    }
+
+    public function getToken(): LazyUuidFromString|string
+    {
+        return $this->offsetGet('verificationToken');
+    }
+
+    public function hashPassword(): string
+    {
+        $filter = new PasswordHash();
+        $this->offsetSet('password', $filter->filter($this->offsetGet('password')));
+        unset($filter);
         return $this->offsetGet('password');
     }
 }

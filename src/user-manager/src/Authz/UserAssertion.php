@@ -22,7 +22,7 @@ final class UserAssertion implements LaminasRbacAssertionInterface
     public function assert(Rbac $rbac, RoleInterface $role, string $permission): bool
     {
         return match ($permission) {
-            'user-manager.login' => $this->assertUserIsGuest($role),
+            'Login' => $this->assertUserIsGuest($role),
              default => true,
         };
     }

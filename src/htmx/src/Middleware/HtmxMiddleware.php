@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace Htmx\Middleware;
 
 use Htmx\RequestHeaders as Htmx;
+use Htmx\View\Model\FooterModel;
+use Htmx\View\Model\HeaderModel;
+use Laminas\View\Model\ViewModel;
+use Laminas\View\Model\ModelInterface;
+use Mezzio\Router\RouteResult;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-use const JSON_PRETTY_PRINT;
-
+use function count;
+use function explode;
 use function json_encode;
+use function str_contains;
+use function ucfirst;
 
 class HtmxMiddleware implements MiddlewareInterface
 {
@@ -41,13 +48,35 @@ class HtmxMiddleware implements MiddlewareInterface
                 false
             );
         }
-        if ($this->htmxConfig['htmx']['enable']) {
+
+        if ($this->htmxConfig['enable']) {
             $this->template->addDefaultParam(
                 TemplateRendererInterface::TEMPLATE_ALL,
                 'htmxConfig',
-                json_encode($this->htmxConfig['htmx']['config'])
+                json_encode($this->htmxConfig['config'])
             );
         }
+
+        /** @var RouteResult */
+        $routeResult = $request->getAttribute(RouteResult::class);
+        if ($routeResult->isSuccess()) {
+            $routeName = $routeResult->getMatchedRouteName() ?? '';
+        }
+
+        // setup the Htmx ViewModel
+        $model = new ViewModel();
+        $model->addChild(
+            new HeaderModel(
+                [
+                    'request' => $request,
+                    'appName' => $this->htmxConfig['app_name'],
+                    'title'   => $routeName,
+                ]
+            )
+        );
+
+        $model->addChild(new FooterModel());
+        $request = $request->withAttribute(ModelInterface::class, $model);
         return $handler->handle($request);
     }
 }

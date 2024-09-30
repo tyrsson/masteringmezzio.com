@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
-use Laminas\Form\FormElementManager;
 use Mezzio\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
 

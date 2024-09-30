@@ -6,9 +6,9 @@ namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Laminas\ServiceManager\Factory\InvokableFactory;
-use Mail\ConfigProvider as MailConfigProvider;
-use Mail\Adapter\PhpMailer;
-use Mail\MailerAwareDelegator;
+use Mailer\ConfigProvider as MailConfigProvider;
+use Mailer\Adapter\AdapterInterface;
+use Mailer\Middleware\MailerMiddleware;
 use Mezzio\Application;
 use Mezzio\Container\ApplicationConfigInjectionDelegator;
 use Mezzio\Authentication\AuthenticationInterface;
@@ -18,18 +18,24 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-use UserManager\Middleware\PhpMailerMiddleware;
+use Webinertia\Validator\Password;
 
 final class ConfigProvider
 {
-    public const USERMANAGER_TABLE_NAME      = 'user-manager_table_name';
-    public const APPEND_HTTP_METHOD_TO_PERMS = 'append_http_method_to_permissions';
-    public const APPEND_ONLY_MAPPED          = 'append_only_mapped';
-    public const RBAC_MAPPED_ROUTES          = 'rbac_mapped_routes';
+    public final const MAIL_MESSAGE_TEMPLATES   = 'message_templates';
+    public final const MAIL_VERIFY_MESSAGE_BODY = 'verify_message_body';
+    public final const MAIL_VERIFY_SUBJECT      = 'verify_message_subject';
+    public final const MAIL_RESET_PASSWORD_MESSAGE_BODY = 'reset_password_message_body';
+    public final const MAIL_RESET_PASSWORD_SUBJECT      = 'reset_password_message_subject';
+    public const USERMANAGER_TABLE_NAME         = 'user-manager_table_name';
+    public const APPEND_HTTP_METHOD_TO_PERMS    = 'append_http_method_to_permissions';
+    public const APPEND_ONLY_MAPPED             = 'append_only_mapped';
+    public const RBAC_MAPPED_ROUTES             = 'rbac_mapped_routes';
 
     public function __invoke(): array
     {
         return [
+            'app_settings'              => $this->getAppSettings(),
             'authentication'            => $this->getAuthenticationConfig(),
             'dependencies'              => $this->getDependencies(),
             'filters'                   => $this->getFilters(),
@@ -46,6 +52,22 @@ final class ConfigProvider
                 static::RBAC_MAPPED_ROUTES          => $this->getRbacMappedRoutes(), // array of routes to map http methods to
             ],
             MailConfigProvider::class => $this->getMailConfig(),
+        ];
+    }
+
+    public function getAppSettings(): array
+    {
+        return [
+            'account_verification_token_expire_time' => '1 Hour',
+            Password::class => [
+                'options' => [
+                    'length'  => 8, // overall length of password
+                    'upper'   => 1, // uppercase count
+                    'lower'   => 2, // lowercase count
+                    'digit'   => 2, // digit count
+                    'special' => 2, // special char count
+                ],
+            ],
         ];
     }
 
@@ -70,16 +92,17 @@ final class ConfigProvider
             ],
             'permissions' => [
                 'Guest' => [
-                    'home',
-                    'user-manager.login',
-                    'user-manager.register',
+                    'Home',
+                    'Login',
+                    'Register',
+                    'Reset Password',
+                    'Verify Account',
                 ],
                 'User'  => [
-                    'user-manager.logout',
-                    'user-manager.account.read',
+                    'Logout',
+                    'Account.read',
                 ],
                 'Administrator' => [
-                    'admin.dashboard.read',
                 ],
             ],
         ];
@@ -88,7 +111,7 @@ final class ConfigProvider
     public function getDependencies(): array
     {
         return [
-            'aliases' => [
+            'aliases'    => [
                 AuthenticationInterface::class       => PhpSession::class,
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
@@ -103,11 +126,13 @@ final class ConfigProvider
                 Authz\Rbac::class                    => Authz\RbacFactory::class,
                 Authz\UserAssertion::class           => InvokableFactory::class,
                 Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
+                Handler\ChangePasswordHandler::class => Handler\ChangePasswordHandlerFactory::class,
                 Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
                 Handler\RegistrationHandler::class   => Handler\RegistrationHandlerFactory::class,
                 Handler\ResetPasswordHandler::class  => Handler\ResetPasswordHandlerFactory::class,
                 Handler\VerifyAccountHandler::class  => Handler\VerifyAccountHandlerFactory::class,
+                Helper\VerificationHelper::class     => Helper\VerificationHelperFactory::class,
                 Middleware\IdentityMiddleware::class => Middleware\IdentityMiddlewareFactory::class,
                 UserRepository\TableGateway::class   => UserRepository\TableGatewayFactory::class,
             ],
@@ -127,9 +152,13 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Form\Login::class    => Form\LoginFactory::class,
-                Form\Register::class => Form\RegisterFactory::class,
-                Form\Fieldset\AcctDataFieldset::class => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\Fieldset\AcctDataFieldset::class      => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\Fieldset\ResendVerification::class    => InvokableFactory::class,
+                Form\Login::class                          => Form\LoginFactory::class,
+                Form\Register::class                       => Form\RegisterFactory::class,
+                Form\ResendVerification::class             => Form\ResendVerificationFactory::class,
+                Form\ResetPassword::class                  => Form\ResetPasswordFactory::class,
+                Form\Fieldset\ResetPasswordFieldset::class => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
             ],
         ];
     }
@@ -146,10 +175,11 @@ final class ConfigProvider
     public function getMailConfig(): array
     {
         return [
-            PhpMailer::class => [
-                'message_templates' => [
-                    'verification_subject' => '%s Account Verification.',
-                    'verification_body'    => 'Please click the link to verify your email address <a href="%s/user-manager/verify/%s">Click Here!!</a>',
+            AdapterInterface::class => [
+                static::MAIL_MESSAGE_TEMPLATES => [
+                    static::MAIL_VERIFY_SUBJECT         => '%s Account Verification.',
+                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
+                    static::MAIL_RESET_PASSWORD_SUBJECT => 'The reset link in this email is valid for %s hour(s). Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
             ],
         ];
@@ -158,7 +188,7 @@ final class ConfigProvider
     public function getRbacMappedRoutes(): array
     {
         return [
-            'user-manager.account', 'admin.dashboard'
+            'Account',
         ];
     }
 
@@ -167,7 +197,7 @@ final class ConfigProvider
         return [
             [
                 'path'       => '/user-manager/login',
-                'name'       => 'user-manager.login', // todo: update name to use um prefix
+                'name'       => 'Login', // todo: update name to use um prefix
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
@@ -177,7 +207,7 @@ final class ConfigProvider
             ],
             [
                 'path'       => '/user-manager/logout',
-                'name'       => 'user-manager.logout',
+                'name'       => 'Logout',
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,
@@ -186,17 +216,37 @@ final class ConfigProvider
             ],
             [
                 'path'        => '/user-manager/register',
-                'name'        => 'user-manager.register',
+                'name'        => 'Register',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
-                    PhpMailerMiddleware::class,
+                    MailerMiddleware::class,
                     Handler\RegistrationHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
+                'path'        => '/user-manager/reset[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'        => 'Reset Password',
+                'middleware'  => [
+                    BodyParamsMiddleware::class,
+                    MailerMiddleware::class,
+                    Handler\ResetPasswordHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
+                'path'        => '/user-manager/verify[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'        => 'Verify Account',
+                'middleware'  => [
+                    BodyParamsMiddleware::class,
+                    MailerMiddleware::class,
+                    Handler\VerifyAccountHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
                 'path'        => '/user-manager/account',
-                'name'        => 'user-manager.account',
+                'name'        => 'Account',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     AuthorizationMiddleware::class,

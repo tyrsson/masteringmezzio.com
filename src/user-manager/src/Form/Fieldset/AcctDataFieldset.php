@@ -13,7 +13,6 @@ use UserManager\UserRepository\UserEntity;
 
 final class AcctDataFieldset extends Fieldset implements InputFilterProviderInterface
 {
-
     public function init(): void
     {
         $this->setHydrator(new ArraySerializableHydrator());
@@ -26,32 +25,32 @@ final class AcctDataFieldset extends Fieldset implements InputFilterProviderInte
             'name' => 'verificationToken',
             'type' => Element\Hidden::class,
         ])->add([
-            'name' => 'firstName',
-            'type' => Element\Text::class,
+            'name'       => 'firstName',
+            'type'       => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'First Name',
             ],
         ])->add([
-            'name' => 'lastName',
-            'type' => Element\Text::class,
+            'name'       => 'lastName',
+            'type'       => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'Last Name',
             ],
         ])->add([
-            'name'    => 'email',
-            'type'    => Element\Text::class,
+            'name'       => 'email',
+            'type'       => Element\Text::class,
             'attributes' => [
                 'placeholder' => 'Email',
             ],
         ])->add([
-            'name'    => 'password',
-            'type'    => Element\Password::class,
+            'name'       => 'password',
+            'type'       => Element\Password::class,
             'attributes' => [
                 'placeholder' => 'Password',
             ],
         ])->add([
-            'name'    => 'conf_password',
-            'type'    => Element\Password::class,
+            'name'       => 'conf_password',
+            'type'       => Element\Password::class,
             'attributes' => [
                 'placeholder' => 'Confirm Password',
             ],

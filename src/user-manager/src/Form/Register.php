@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
-use Htmx\HtmxAttributes as Htmx;
+use Fig\Http\Message\RequestMethodInterface as Http;
 use Htmx\Form\HtmxTrait;
 use Laminas\Form;
 use UserManager\Form\Fieldset\AcctDataFieldset;
@@ -16,20 +16,16 @@ class Register extends Form\Form
     public function init(): void
     {
         $this->setAttributes([
-            Htmx::HX_Post->value   => $this->urlHelper->generate('user-manager.register'),
-            Htmx::HX_Target->value => '#app-main',
+            'action' => $this->urlHelper->generate('Register'),
+            'method' => Http::METHOD_POST,
         ]);
-        $this->add(
-            [
+        $this->add([
                 'name'    => 'acct-data',
                 'type'    => AcctDataFieldset::class,
                 'options' => [
                     'use_as_base_fieldset' => true,
                 ],
-            ]
-        );
-
-        $this->add([
+        ])->add([
             'name'       => 'Register',
             'type'       => Form\Element\Submit::class,
             'attributes' => [

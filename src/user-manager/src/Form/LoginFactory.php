@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
-use UserManager\Form\Login;
+use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Mezzio\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
@@ -15,6 +15,7 @@ class LoginFactory implements FactoryInterface
     {
         $form = new Login();
         $form->setUrlHelper($container->get(UrlHelper::class));
+        $form->setDbAdapter($container->get(AdapterInterface::class));
         return $form;
     }
 }

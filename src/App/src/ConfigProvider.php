@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
-use Mezzio\Authorization\AuthorizationMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
 
 /**
@@ -15,6 +15,7 @@ use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
  */
 class ConfigProvider
 {
+    public final const APP_SETTINGS_KEY = 'app_settings';
     /**
      * Returns the configuration array
      *
@@ -24,9 +25,49 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'dependencies'       => $this->getDependencies(),
-            'templates'          => $this->getTemplates(),
-            'routes'             => $this->getRoutes(),
+            'dependencies'              => $this->getDependencies(),
+            'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
+            'templates'                 => $this->getTemplates(),
+            'routes'                    => $this->getRoutes(),
+            static::APP_SETTINGS_KEY    => $this->getAppSettings(),
+            \UserManager\ConfigProvider::class => [
+                \UserManager\ConfigProvider::RBAC_MAPPED_ROUTES => $this->getRbacMappedRoutes(),
+            ]
+        ];
+    }
+
+    public function getAppSettings(): array
+    {
+        return [];
+    }
+
+    public function getAuthorizationConfig(): array
+    {
+        return [
+            // 'roles'       => [
+            //     'Administrator' => [],
+            //     //'Editor'        => ['Administrator'],
+            //     //'Contributor'   => ['Editor'],
+            //     'User'          => ['Administrator'],
+            //     'Guest'         => ['User'],
+            // ],
+            'permissions' => [
+                'Guest' => [
+                    'Home',
+                ],
+                'User'  => [
+                ],
+                'Administrator' => [
+                    'Admin Dashboard.read',
+                ],
+            ],
+        ];
+    }
+
+    public function getRbacMappedRoutes(): array
+    {
+        return [
+            'Admin Dashboard'
         ];
     }
 
@@ -40,6 +81,7 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories'  => [
+                FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,
                 Middleware\AjaxRequestMiddleware::class => Middleware\AjaxRequestMiddlewareFactory::class,
@@ -53,7 +95,7 @@ class ConfigProvider
         return [
             [
                 'path' => '/',
-                'name' => 'home',
+                'name' => 'Home',
                 'middleware' => [
                     Handler\HomePageHandler::class,
                 ],
@@ -61,7 +103,7 @@ class ConfigProvider
             ],
             [
                 'path' => '/admin',
-                'name' => 'admin.dashboard',
+                'name' => 'Admin Dashboard',
                 'middleware' => [
                     //AuthorizationMiddleware::class,
                     BodyParamsMiddleware::class,

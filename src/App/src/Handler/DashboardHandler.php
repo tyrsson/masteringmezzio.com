@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\View\Model\ModelInterface;
 use Mezzio\Template\TemplateRendererInterface;
 
 class DashboardHandler implements RequestHandlerInterface
@@ -24,13 +25,10 @@ class DashboardHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
-        // Do some work...
-        // Render and return a response:
+        $model = $request->getAttribute(ModelInterface::class);
         return new HtmlResponse($this->renderer->render(
             'app::dashboard',
-            [
-                'layout' => 'layout::admin',
-            ] // parameters to pass to template
+            $model
         ));
     }
 }

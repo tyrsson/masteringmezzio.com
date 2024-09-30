@@ -12,7 +12,7 @@ use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator\Identical;
 use Laminas\Validator\StringLength;
-use Webinertia\Filter\PasswordHash;
+use Webinertia\Validator\Password as PasswordValidator;
 
 final class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
 {
@@ -22,13 +22,14 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
      * @return void
      * @throws InvalidArgumentException
      */
-    public function __construct($name = 'password-data', $options = [])
+    public function __construct(array $config, $name = 'acct-data', $options = [])
     {
         parent::__construct($name, $options);
     }
 
     public function init(): void
     {
+
         $this->add([
             'name'    => 'password',
             'type'    => Password::class,
@@ -54,7 +55,6 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
                 'filters'    => [
                     ['name' => StripTags::class],
                     ['name' => StringTrim::class],
-                    ['name' => PasswordHash::class],
                 ],
                 'validators' => [
                     [
@@ -63,6 +63,16 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
                             'encoding' => 'UTF-8',
                             'min'      => 1,
                             'max'      => 100,
+                        ],
+                    ],
+                    [
+                        'name' => PasswordValidator::class,
+                        'options' => [
+                            'length'  => 8, // overall length of password
+                            'upper'   => 1, // uppercase count
+                            'lower'   => 2, // lowercase count
+                            'digit'   => 2, // digit count
+                            'special' => 2, // special char count
                         ],
                     ],
                 ],
