@@ -36,52 +36,6 @@ class HomePageHandler implements RequestHandlerInterface
     {
         $data = [];
 
-        switch ($this->containerName) {
-            case ServiceManager::class:
-                $data['containerName'] = 'Laminas Servicemanager';
-                $data['containerDocs'] = 'https://docs.laminas.dev/laminas-servicemanager/';
-                break;
-            case ContainerBuilder::class:
-                $data['containerName'] = 'Symfony DI Container';
-                $data['containerDocs'] = 'https://symfony.com/doc/current/service_container.html';
-                break;
-            case 'Elie\PHPDI\Config\ContainerWrapper':
-            case PHPDIContainer::class:
-                $data['containerName'] = 'PHP-DI';
-                $data['containerDocs'] = 'https://php-di.org';
-                break;
-            case MinimalContainer::class:
-                $data['containerName'] = 'Chubbyphp Container';
-                $data['containerDocs'] = 'https://github.com/chubbyphp/chubbyphp-container';
-                break;
-        }
-
-        if ($this->router instanceof FastRouteRouter) {
-            $data['routerName'] = 'FastRoute';
-            $data['routerDocs'] = 'https://github.com/nikic/FastRoute';
-        } elseif ($this->router instanceof LaminasRouter) {
-            $data['routerName'] = 'Laminas Router';
-            $data['routerDocs'] = 'https://docs.laminas.dev/laminas-router/';
-        }
-
-        if ($this->template === null) {
-            return new JsonResponse([
-                'welcome' => 'Congratulations! You have installed the mezzio skeleton application.',
-                'docsUrl' => 'https://docs.mezzio.dev/mezzio/',
-            ] + $data);
-        }
-
-        if ($this->template instanceof PlatesRenderer) {
-            $data['templateName'] = 'Plates';
-            $data['templateDocs'] = 'https://platesphp.com/';
-        } elseif ($this->template instanceof TwigRenderer) {
-            $data['templateName'] = 'Twig';
-            $data['templateDocs'] = 'https://twig.symfony.com';
-        } elseif ($this->template instanceof LaminasViewRenderer) {
-            $data['templateName'] = 'Laminas View';
-            $data['templateDocs'] = 'https://docs.laminas.dev/laminas-view/';
-        }
-
         $model = $request->getAttribute(ModelInterface::class);
         $model->setVariables($data);
         return new HtmlResponse($this->template->render('app::home-page', $model));

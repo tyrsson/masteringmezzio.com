@@ -17,11 +17,11 @@ trait HandlerTrait
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return match ($request->getMethod()) {
-            Http::METHOD_GET  => $this->handleGet($request),
-            Http::METHOD_POST => $this->handlePost($request),
+            Http::METHOD_GET    => $this->handleGet($request),
+            Http::METHOD_POST   => $this->handlePost($request),
             Http::METHOD_DELETE => $this->handleDelete($request),
             Http::METHOD_PUT    => $this->handlePut($request),
-            default => new EmptyResponse(405),
+            default             => new EmptyResponse(405),
         };
     }
 

@@ -1,8 +1,3 @@
-// htmx.logger = function(elt, event, data) {
-//     if(console) {
-//         console.log(event, elt, data);
-//     }
-// }
 // htmx.onLoad((e) => {
 //     const isOpenClass       = "modal-is-open";
 //     const openingClass      = "modal-is-opening";
@@ -36,9 +31,4 @@
 //             }, animationDuration);
 //         };
 //     }
-
 // });
-// const updateNav = () => {
-//     htmx.ajax('GET', '/nav', '#nav');
-// };
-// htmx.on("updateNav", evt => updateNav());

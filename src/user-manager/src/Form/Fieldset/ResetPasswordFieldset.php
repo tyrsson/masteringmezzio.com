@@ -13,6 +13,7 @@ use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Hydrator\ArraySerializableHydrator;
 use Laminas\Validator;
 use UserManager\UserRepository\UserEntity;
+use Webinertia\Filter\Uuid;
 
 final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterface, InputFilterProviderInterface
 {
@@ -33,6 +34,9 @@ final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterf
         $this->setObject(new UserEntity());
 
         $this->add([
+            'name' => 'verificationToken',
+            'type' => Element\Hidden::class,
+        ])->add([
             'name'    => 'email',
             'type'    => Element\Text::class,
             'attributes' => [
@@ -44,6 +48,15 @@ final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterf
     public function getInputFilterSpecification(): array
     {
         return [
+            [
+                'name'        => 'verificationToken',
+                'allow_empty' => true,
+                'filters'     => [
+                    ['name' => Filter\ToInt::class],
+                    ['name' => Filter\ToNull::class],
+                    ['name' => Uuid::class],
+                ],
+            ],
             [
                 'name' => 'email',
                 'required' => true,

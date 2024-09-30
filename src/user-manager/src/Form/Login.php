@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\Form;
 
-use Htmx\HtmxAttributes as Htmx;
+use Fig\Http\Message\RequestMethodInterface as Http;
 use Htmx\Form\HtmxTrait;
 use Laminas\Db\Adapter\AdapterAwareInterface;
 use Laminas\Db\Adapter\AdapterAwareTrait;
@@ -29,7 +29,7 @@ final class Login extends Form\Form implements AdapterAwareInterface, InputFilte
     public function init(): void
     {
         $this->setAttributes([
-            'method' => 'POST',
+            'method' => Http::METHOD_POST,
             'action' => $this->urlHelper->generate('Login')
         ]);
         $this->add([

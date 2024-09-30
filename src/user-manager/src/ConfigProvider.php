@@ -25,6 +25,8 @@ final class ConfigProvider
     public final const MAIL_MESSAGE_TEMPLATES   = 'message_templates';
     public final const MAIL_VERIFY_MESSAGE_BODY = 'verify_message_body';
     public final const MAIL_VERIFY_SUBJECT      = 'verify_message_subject';
+    public final const MAIL_RESET_PASSWORD_MESSAGE_BODY = 'reset_password_message_body';
+    public final const MAIL_RESET_PASSWORD_SUBJECT      = 'reset_password_message_subject';
     public const USERMANAGER_TABLE_NAME         = 'user-manager_table_name';
     public const APPEND_HTTP_METHOD_TO_PERMS    = 'append_http_method_to_permissions';
     public const APPEND_ONLY_MAPPED             = 'append_only_mapped';
@@ -175,8 +177,9 @@ final class ConfigProvider
         return [
             AdapterInterface::class => [
                 static::MAIL_MESSAGE_TEMPLATES => [
-                    static::MAIL_VERIFY_SUBJECT      => '%s Account Verification.',
-                    static::MAIL_VERIFY_MESSAGE_BODY => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
+                    static::MAIL_VERIFY_SUBJECT         => '%s Account Verification.',
+                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
+                    static::MAIL_RESET_PASSWORD_SUBJECT => 'The reset link in this email is valid for %s hour(s). Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
             ],
         ];

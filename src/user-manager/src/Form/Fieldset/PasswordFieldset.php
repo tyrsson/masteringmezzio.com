@@ -22,7 +22,7 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
      * @return void
      * @throws InvalidArgumentException
      */
-    public function __construct($name = 'acct-data', $options = [])
+    public function __construct(array $config, $name = 'acct-data', $options = [])
     {
         parent::__construct($name, $options);
     }

@@ -19,18 +19,13 @@ class Register extends Form\Form
             'action' => $this->urlHelper->generate('Register'),
             'method' => Http::METHOD_POST,
         ]);
-
-        $this->add(
-            [
+        $this->add([
                 'name'    => 'acct-data',
                 'type'    => AcctDataFieldset::class,
                 'options' => [
                     'use_as_base_fieldset' => true,
                 ],
-            ]
-        );
-
-        $this->add([
+        ])->add([
             'name'       => 'Register',
             'type'       => Form\Element\Submit::class,
             'attributes' => [
