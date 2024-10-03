@@ -34,11 +34,11 @@ final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterf
         $this->setObject(new UserEntity());
 
         $this->add([
-            'name' => 'verificationToken',
+            'name' => 'passwordResetToken',
             'type' => Element\Hidden::class,
         ])->add([
             'name'    => 'email',
-            'type'    => Element\Text::class,
+            'type'    => Element\Email::class,
             'attributes' => [
                 'placeholder' => 'Email',
             ],
@@ -49,7 +49,7 @@ final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterf
     {
         return [
             [
-                'name'        => 'verificationToken',
+                'name'        => 'passwordResetToken',
                 'allow_empty' => true,
                 'filters'     => [
                     ['name' => Filter\ToInt::class],

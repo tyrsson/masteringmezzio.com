@@ -81,6 +81,17 @@ final class UserEntity extends ArrayObject implements Db\EntityInterface, UserIn
         return $this->offsetGet('verificationToken');
     }
 
+    public function setPasswordResetToken(LazyUuidFromString|string $token): self
+    {
+        $this->offsetSet('passwordResetToken', $token);
+        return $this;
+    }
+
+    public function getPasswordResetToken(): LazyUuidFromString|string
+    {
+        return $this->offsetGet('passwordResetToken');
+    }
+
     public function hashPassword(): string
     {
         $filter = new PasswordHash();

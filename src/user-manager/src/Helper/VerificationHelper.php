@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Uuid\Rfc4122\UuidV7;
 use UserManager\UserRepository\TableGateway;
 use UserManager\UserRepository\UserEntity;
+use UserManager\Validator\UuidV7TokenValidator as TokenValidator;
 
 final class VerificationHelper
 {
@@ -31,7 +32,7 @@ final class VerificationHelper
         return $this;
     }
 
-    public function verify(ServerRequestInterface $request): UserEntity|false
+    public function verify(ServerRequestInterface $request, string $tokenLifetime = '1 Hour'): UserEntity|false
     {
         $routeResult   = $request->getAttribute(RouteResult::class);
         $matchedParams = $routeResult->getMatchedParams();
@@ -41,16 +42,11 @@ final class VerificationHelper
             }
 
             if ($matchedParams['token'] === $this->target->offsetGet('verificationToken')) {
-                /** @var Uuidv7 */
-                $uuid          = UuidV7::fromString($this->target->offsetGet('verificationToken'));
-                $tokenDatetime = $uuid->getDateTime();
-                $now           = new DateTimeImmutable();
-                $expire        = $tokenDatetime->add(
-                    DateInterval::createFromDateString(
-                        $this->config['app_settings']['account_verification_token_expire_time']
-                    )
-                );
-                if ($now <= $expire) {
+                $tokenValidator = new TokenValidator([
+                        'max_lifetime' => $tokenLifetime,
+                    ]);
+                if ($tokenValidator->isValid($this->target->offsetGet('verificationToken'))) {
+                    $now       = new DateTimeImmutable();
                     $timeStamp = $now->format($this->config['app_settings']['datetime_format']);
                     $this->target->offsetSet(
                         'dateVerified',
@@ -67,6 +63,11 @@ final class VerificationHelper
             throw $th;
         }
         return false;
+    }
+
+    public function verifyResetToken()
+    {
+
     }
 
     public function setTarget(UserEntity $target): void

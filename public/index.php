@@ -18,12 +18,12 @@ require 'vendor/autoload.php';
 (function () {
     $showDebug = false;
     $adapter   = null;
-    if (file_exists('config/development.config.php') && class_exists(\Debug\Clock::class)) {
+    if (file_exists('config/development.config.php') && class_exists(\Debug\Debug::class)) {
         $debugConfig = require 'config/development.config.php';
 
         if ($debugConfig['debug']) {
             $showDebug = true;
-            \Debug\Clock::timer('total-runtime');
+            \Debug\Debug::timer('total-runtime');
         }
     }
 
@@ -43,7 +43,7 @@ require 'vendor/autoload.php';
 
     $app->run();
     if ($showDebug) {
-        echo \Debug\Clock::timer('total-runtime');
-        echo \Debug\Clock::queryProfiles($adapter);
+        echo \Debug\Debug::timer('total-runtime');
+        echo \Debug\Debug::dbDebug($adapter);
     }
 })();

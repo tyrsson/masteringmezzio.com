@@ -25,6 +25,10 @@ declare(strict_types=1);
 namespace Debug;
 
 use Exception;
+use Laminas\Db\Adapter\Adapter;
+use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\Db\Adapter\Profiler\Profiler;
+use RuntimeException;
 
 use function basename;
 use function extension_loaded;
@@ -49,7 +53,7 @@ use const PHP_SAPI;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
-class Dumper
+class Debug
 {
     /** @var string */
     protected static $_sapi;
@@ -132,5 +136,34 @@ class Dumper
             echo $output;
         }
         return $output;
+    }
+
+    public static function timer(?string $name = null): string|float
+    {
+        static $time = [];
+        $now = hrtime(true);
+        $delta = isset($time[$name]) ? $now - $time[$name] : 0;
+        $time[$name] = $now;
+        $elapsed = $delta / 1e+6;
+        return '<pre> ' . $name . ' ' . $elapsed . ' ms</pre>';
+    }
+
+    public static function dbDebug(AdapterInterface&Adapter $adapter)
+    {
+        /** @var Profiler */
+        $profiler = $adapter->getProfiler();
+        if (! $profiler instanceof Profiler) {
+            throw new RuntimeException(Adapter::class . ' Must have a composed ' . Profiler::class . ' instance before calling dbDebug.');
+        }
+        foreach ($profiler->getProfiles() as $profile) {
+            ['sql' => $sql, 'elapse' => $elapse] = $profile;
+            static::dump(
+                [
+                    'sql' => $sql,
+                    'elapsed-time' => number_format($elapse * 1000, 5, '.', "\u{202f}") . ' ms',
+                ],
+                'Query Profile:'
+            );
+        }
     }
 }

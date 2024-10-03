@@ -47,7 +47,12 @@ class VerifyAccountHandler implements RequestHandlerInterface
         try {
             $model = $request->getAttribute(ModelInterface::class);
             $model->setVariable('form', $this->form);
-            if (! $this->verifyHelper->verify($request)) {
+            if (
+                ! $this->verifyHelper->verify(
+                    $request,
+                    $this->config['app_settings']['account_verification_token_max_lifetime']
+                )
+            ) {
                 /** @var UserEntity */
                 $target = $this->verifyHelper->getTarget();
                 // unset this to allow a new token to be generated
@@ -104,6 +109,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
                 $adapter?->body(
                     sprintf(
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
+                        $this->config['app_settings']['account_verification_token_max_lifetime'],
                         $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
                         $this->urlHelper->generate(
                             routeName: 'Verify Account',

@@ -58,7 +58,8 @@ final class ConfigProvider
     public function getAppSettings(): array
     {
         return [
-            'account_verification_token_expire_time' => '1 Hour',
+            'account_verification_token_max_lifetime'   => '1 Hour',
+            'account_password_reset_token_max_lifetime' => '1 Hour',
             Password::class => [
                 'options' => [
                     'length'  => 8, // overall length of password
@@ -178,8 +179,9 @@ final class ConfigProvider
             AdapterInterface::class => [
                 static::MAIL_MESSAGE_TEMPLATES => [
                     static::MAIL_VERIFY_SUBJECT         => '%s Account Verification.',
-                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address <a href="%s%s">Click Here!!</a>',
-                    static::MAIL_RESET_PASSWORD_SUBJECT => 'The reset link in this email is valid for %s hour(s). Please <a href="%s%s">Click Here!!</a> to reset your password.'
+                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address. The link is valid for %s. <a href="%s%s">Click Here!!</a>',
+                    static::MAIL_RESET_PASSWORD_SUBJECT => '%s Password Reset.',
+                    static::MAIL_RESET_PASSWORD_MESSAGE_BODY => 'The reset link in this email is valid for %s. Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
             ],
         ];
@@ -225,12 +227,22 @@ final class ConfigProvider
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],
             [
-                'path'        => '/user-manager/reset[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'path'        => '/user-manager/reset-password',
                 'name'        => 'Reset Password',
                 'middleware'  => [
                     BodyParamsMiddleware::class,
                     MailerMiddleware::class,
                     Handler\ResetPasswordHandler::class,
+                ],
+                'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
+            ],
+            [
+                'path'        => '/user-manager/change-password[/{id:\d+}[/{token:[a-zA-Z0-9-]+}]]',
+                'name'        => 'Change Password',
+                'middleware'  => [
+                    BodyParamsMiddleware::class,
+                    MailerMiddleware::class,
+                    Handler\ChangePasswordHandler::class,
                 ],
                 'allowed_methods' => [Http::METHOD_GET, Http::METHOD_POST],
             ],

@@ -80,7 +80,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
                 $serverParams = $request->getServerParams();
                 /** @var UserEntity */
                 $result = $this->userRepositoryInterface->findOneBy('email', $userEntity->email);
-                $result->setToken($userEntity->getToken());
+                $result->setPasswordResetToken($userEntity->getPasswordResetToken());
                 $result = $this->userRepositoryInterface->save($result, 'id');
                 /** @var Mailer */
                 $mailer = $request->getAttribute(MailerInterface::class);
@@ -101,12 +101,13 @@ class ResetPasswordHandler implements RequestHandlerInterface
                 $adapter?->body(
                     sprintf(
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_MESSAGE_BODY],
-                        $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
+                        $this->config['app_settings']['account_password_reset_token_max_lifetime'],
+                        $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'], // host
                         $this->url->generate(
-                            routeName: 'Verify Account',
+                            routeName: 'Change Password',
                             routeParams: [
                                 'id'    => $result->id,
-                                'token' => $result->verificationToken,
+                                'token' => $result->passwordResetToken,
                             ],
                             options: ['reuse_query_params' => false]
                         )
