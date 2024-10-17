@@ -24,24 +24,4 @@ trait HandlerTrait
             default             => new EmptyResponse(405),
         };
     }
-
-    public function handleDelete(ServerRequestInterface $request): ResponseInterface
-    {
-        return new EmptyResponse(405);
-    }
-
-    public function handleGet(ServerRequestInterface $request): ResponseInterface
-    {
-        return new EmptyResponse(405);
-    }
-
-    public function handlePost(ServerRequestInterface $request): ResponseInterface
-    {
-        return new EmptyResponse(405);
-    }
-
-    public function handlePut(ServerRequestInterface $request): ResponseInterface
-    {
-        return new EmptyResponse(405);
-    }
 }

@@ -48,15 +48,16 @@ class VerifyAccountHandler implements RequestHandlerInterface
             $model = $request->getAttribute(ModelInterface::class);
             $model->setVariable('form', $this->form);
             if (
-                ! $this->verifyHelper->verify(
+                ! $this->verifyHelper->verifyToken(
                     $request,
-                    $this->config['app_settings']['account_verification_token_max_lifetime']
+                    VerificationHelper::VERIFICATION_TOKEN,
+                    $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN]
                 )
             ) {
                 /** @var UserEntity */
                 $target = $this->verifyHelper->getTarget();
                 // unset this to allow a new token to be generated
-                $target->offsetUnset('verificationToken');
+                $target->offsetUnset(VerificationHelper::VERIFICATION_TOKEN);
                 // send form to resend email
                 $this->form->bind($target);
                 $this->form->setAttributes([

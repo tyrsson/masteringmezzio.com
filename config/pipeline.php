@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use App\Middleware\AjaxRequestMiddleware;
-use App\Middleware\ContextMiddleware;
-
 use App\Middleware\TemplateMiddleware;
 use Htmx\Middleware\HtmxMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;

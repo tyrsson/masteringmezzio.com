@@ -23,6 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\ConfigProvider;
 use UserManager\Form\Register;
+use UserManager\Helper\VerificationHelper;
 use UserManager\UserRepository\TableGateway;
 use Webinertia\Filter\PasswordHash;
 
@@ -58,10 +59,12 @@ class RegistrationHandler implements RequestHandlerInterface
         $body = $request->getParsedBody();
         $this->form->setData($body);
         if ($this->form->isValid()) {
+            $uri = $request->getUri();
+            $host = $uri->getScheme() . '://' . $uri->getHost();
+            $host .= $uri->getPort() !== null ? ':' . $uri->getPort() : '';
             $userEntity = $this->form->getData();
             $userEntity->offsetUnset('conf_password');
             try {
-                $serverParams = $request->getServerParams();
                 $userEntity->hashPassword();
                 $result       = $this->userRepositoryInterface->save($userEntity, 'id');
                 /** @var Mailer */
@@ -83,7 +86,8 @@ class RegistrationHandler implements RequestHandlerInterface
                 $adapter?->body(
                     sprintf(
                         $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_VERIFY_MESSAGE_BODY],
-                        $serverParams['REQUEST_SCHEME'] . '://' . $serverParams['HTTP_HOST'],
+                        $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::VERIFICATION_TOKEN],
+                        $host,
                         $this->urlHelper->generate(
                             routeName: 'Verify Account',
                             routeParams: [

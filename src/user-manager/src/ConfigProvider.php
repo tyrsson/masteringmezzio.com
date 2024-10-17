@@ -22,15 +22,16 @@ use Webinertia\Validator\Password;
 
 final class ConfigProvider
 {
-    public final const MAIL_MESSAGE_TEMPLATES   = 'message_templates';
-    public final const MAIL_VERIFY_MESSAGE_BODY = 'verify_message_body';
-    public final const MAIL_VERIFY_SUBJECT      = 'verify_message_subject';
-    public final const MAIL_RESET_PASSWORD_MESSAGE_BODY = 'reset_password_message_body';
-    public final const MAIL_RESET_PASSWORD_SUBJECT      = 'reset_password_message_subject';
-    public const USERMANAGER_TABLE_NAME         = 'user-manager_table_name';
-    public const APPEND_HTTP_METHOD_TO_PERMS    = 'append_http_method_to_permissions';
-    public const APPEND_ONLY_MAPPED             = 'append_only_mapped';
-    public const RBAC_MAPPED_ROUTES             = 'rbac_mapped_routes';
+    public const MAIL_MESSAGE_TEMPLATES           = 'message_templates';
+    public const MAIL_VERIFY_MESSAGE_BODY         = 'verify_message_body';
+    public const MAIL_VERIFY_SUBJECT              = 'verify_message_subject';
+    public const MAIL_RESET_PASSWORD_MESSAGE_BODY = 'reset_password_message_body';
+    public const MAIL_RESET_PASSWORD_SUBJECT      = 'reset_password_message_subject';
+    public const TOKEN_KEY                        = 'token_lifetime';
+    public const USERMANAGER_TABLE_NAME           = 'user-manager_table_name';
+    public const APPEND_HTTP_METHOD_TO_PERMS      = 'append_http_method_to_permissions';
+    public const APPEND_ONLY_MAPPED               = 'append_only_mapped';
+    public const RBAC_MAPPED_ROUTES               = 'rbac_mapped_routes';
 
     public function __invoke(): array
     {
@@ -58,8 +59,10 @@ final class ConfigProvider
     public function getAppSettings(): array
     {
         return [
-            'account_verification_token_max_lifetime'   => '1 Hour',
-            'account_password_reset_token_max_lifetime' => '1 Hour',
+            'token_lifetime' => [
+                'verificationToken'   => '1 Hour',
+                'passwordResetToken'  => '1 Hour',
+            ],
             Password::class => [
                 'options' => [
                     'length'  => 8, // overall length of password
@@ -98,6 +101,7 @@ final class ConfigProvider
                     'Register',
                     'Reset Password',
                     'Verify Account',
+                    'Change Password',
                 ],
                 'User'  => [
                     'Logout',
@@ -179,7 +183,7 @@ final class ConfigProvider
             AdapterInterface::class => [
                 static::MAIL_MESSAGE_TEMPLATES => [
                     static::MAIL_VERIFY_SUBJECT         => '%s Account Verification.',
-                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address. The link is valid for %s. <a href="%s%s">Click Here!!</a>',
+                    static::MAIL_VERIFY_MESSAGE_BODY    => 'Please click the link to verify your email address. The link is valid for %s. Please <a href="%s%s">Click Here!!</a>',
                     static::MAIL_RESET_PASSWORD_SUBJECT => '%s Password Reset.',
                     static::MAIL_RESET_PASSWORD_MESSAGE_BODY => 'The reset link in this email is valid for %s. Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],

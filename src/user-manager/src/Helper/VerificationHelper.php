@@ -6,16 +6,21 @@ namespace UserManager\Helper;
 
 use DateInterval;
 use DateTimeImmutable;
+use Laminas\Db\Sql\Select;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Router\RouteResult;
 use Psr\Http\Message\ServerRequestInterface;
-use Ramsey\Uuid\Rfc4122\UuidV7;
+use UserManager\ConfigProvider;
 use UserManager\UserRepository\TableGateway;
 use UserManager\UserRepository\UserEntity;
 use UserManager\Validator\UuidV7TokenValidator as TokenValidator;
 
 final class VerificationHelper
 {
+    final public const VERIFICATION_TOKEN   = 'verificationToken';
+    final public const PASSWORD_RESET_TOKEN = 'passwordResetToken';
+    final public const DEFAULT_LIFETIME     = '1 Hour';
+
     private UserEntity $target;
 
     public function __construct(
@@ -24,37 +29,33 @@ final class VerificationHelper
     ) {
     }
 
-    public function __invoke(?ServerRequestInterface $request = null): self|UserEntity|false
-    {
-        if ($request !== null) {
-            return $this->verify($request);
-        }
-        return $this;
-    }
-
-    public function verify(ServerRequestInterface $request, string $tokenLifetime = '1 Hour'): UserEntity|false
-    {
+    public function verifyToken(
+        ServerRequestInterface $request,
+        ?string $type = self::VERIFICATION_TOKEN,
+        ?string $tokenLifetime = null
+    ): UserEntity|bool {
         $routeResult   = $request->getAttribute(RouteResult::class);
         $matchedParams = $routeResult->getMatchedParams();
+        $data = [];
         try {
+
             if (empty($this->target)) {
                 $this->target = $this->userRepositoryInterface->findOneBy('id', $matchedParams['id']);
             }
 
-            if ($matchedParams['token'] === $this->target->offsetGet('verificationToken')) {
+            if ($matchedParams['token'] === $this->target->offsetGet($type)) {
                 $tokenValidator = new TokenValidator([
-                        'max_lifetime' => $tokenLifetime,
+                        'max_lifetime' => $tokenLifetime ?? $this->config[ConfigProvider::TOKEN_KEY][$type],
                     ]);
-                if ($tokenValidator->isValid($this->target->offsetGet('verificationToken'))) {
-                    $now       = new DateTimeImmutable();
-                    $timeStamp = $now->format($this->config['app_settings']['datetime_format']);
-                    $this->target->offsetSet(
-                        'dateVerified',
-                        $timeStamp
-                    );
-                    $this->target->offsetSet('dateUpdated', $timeStamp);
-                    $this->target->offsetSet('verified', 1);
-                    $this->target->offsetSet('verificationToken', null);
+                if ($tokenValidator->isValid($this->target->offsetGet($type))) {
+                    $now                 = new DateTimeImmutable();
+                    $data['dateUpdated'] = $now->format($this->config['app_settings']['datetime_format']);
+                    if ($type === self::VERIFICATION_TOKEN) {
+                        $data['dateVerified'] = $data['dateUpdated'];
+                        $data['verified']     = 1;
+                    }
+                    $data[$type] = null;
+                    $this->target->exchangeArray($data);
                     $this->target = $this->userRepositoryInterface->save($this->target, 'id');
                     return $this->target;
                 }
@@ -63,11 +64,6 @@ final class VerificationHelper
             throw $th;
         }
         return false;
-    }
-
-    public function verifyResetToken()
-    {
-
     }
 
     public function setTarget(UserEntity $target): void
@@ -79,4 +75,5 @@ final class VerificationHelper
     {
         return $this->target;
     }
+
 }

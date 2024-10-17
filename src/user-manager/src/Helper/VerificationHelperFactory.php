@@ -11,9 +11,11 @@ final class VerificationHelperFactory
 {
     public function __invoke(ContainerInterface $container): VerificationHelper
     {
-        return new VerificationHelper(
+        $helper = new VerificationHelper(
             $container->get(UserRepositoryInterface::class),
             $container->get('config')
         );
+
+        return $helper;
     }
 }

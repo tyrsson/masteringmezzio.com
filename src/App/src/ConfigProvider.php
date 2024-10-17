@@ -7,6 +7,7 @@ namespace App;
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
+use Psr\Container\ContainerInterface;
 
 /**
  * The configuration provider for the App module
@@ -26,6 +27,7 @@ class ConfigProvider
     {
         return [
             'dependencies'              => $this->getDependencies(),
+            'laminas-cli'               => $this->getConsoleConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'templates'                 => $this->getTemplates(),
             'routes'                    => $this->getRoutes(),
@@ -64,6 +66,15 @@ class ConfigProvider
         ];
     }
 
+    public function getConsoleConfig(): array
+    {
+        return [
+            'commands' => [
+                'mezzio:handler:crud' => Tooling\CreateCrudHandlerCommand::class,
+            ],
+        ];
+    }
+
     public function getRbacMappedRoutes(): array
     {
         return [
@@ -81,6 +92,7 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories'  => [
+                Tooling\CreateCrudHandlerCommand::class => Tooling\CreateCrudHandlerCommandFactory::class,
                 FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,

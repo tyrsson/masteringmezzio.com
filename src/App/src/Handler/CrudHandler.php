@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\Handler;
+namespace App\Handler;
 
 use App\HandlerTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -12,7 +12,7 @@ use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\View\Model\ModelInterface;
 use Mezzio\Template\TemplateRendererInterface;
 
-class ChangePasswordHandler implements RequestHandlerInterface
+class CrudHandler implements RequestHandlerInterface
 {
     use HandlerTrait;
 
@@ -24,10 +24,24 @@ class ChangePasswordHandler implements RequestHandlerInterface
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
         $model = $request->getAttribute(ModelInterface::class);
-
         return new HtmlResponse($this->renderer->render(
-            'user-manager::change-password',
-            $model
+            'app::crud',
+            [] // parameters to pass to template
         ));
+    }
+
+    public function handlePost(ServerRequestInterface $request): ResponseInterface
+    {
+        // Create and return a response
+    }
+
+    public function handlePut(ServerRequestInterface $request): ResponseInterface
+    {
+        // Create and return a response
+    }
+
+    public function handleDelete(ServerRequestInterface $request): ResponseInterface
+    {
+        // Create and return a response
     }
 }
