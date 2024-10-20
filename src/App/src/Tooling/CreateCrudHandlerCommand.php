@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tooling;
 
 use App\Tooling\ClassSkeletons;
+use App\Tooling\CreateTemplate;
 use Mezzio\Tooling\CreateHandler\CreateHandler;
-use Mezzio\Tooling\CreateHandler\CreateTemplate;
 use Mezzio\Tooling\TemplateResolutionTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;

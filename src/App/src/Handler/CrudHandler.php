@@ -23,10 +23,14 @@ class CrudHandler implements RequestHandlerInterface
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {
+        $data = [
+            'title' => 'crud',
+        ];
         $model = $request->getAttribute(ModelInterface::class);
+        $model->setVariables($data);
         return new HtmlResponse($this->renderer->render(
             'app::crud',
-            [] // parameters to pass to template
+            $model
         ));
     }
 
