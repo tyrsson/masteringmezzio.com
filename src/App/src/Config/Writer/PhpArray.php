@@ -10,7 +10,7 @@ use function sprintf;
 
 class PhpArray extends BaseWriter
 {
-    public final const TEMPLATE = <<<'EOT'
+    public const TEMPLATE = <<<'EOT'
         <?php
 
         declare(strict_types=1);
@@ -21,7 +21,7 @@ class PhpArray extends BaseWriter
 
         EOT;
 
-        public function processConfig(array $config)
+    public function processConfig(array $config)
     {
         $arraySyntax = [
             'open'  => $this->useBracketArraySyntax ? '[' : 'array(',
