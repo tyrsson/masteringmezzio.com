@@ -71,6 +71,7 @@ class ConfigProvider
         return [
             'commands' => [
                 'mezzio:handler:crud' => Tooling\CreateCrudHandlerCommand::class,
+                'mezzio:route:create' => Tooling\CreateRouteCommand::class,
             ],
         ];
     }
@@ -93,6 +94,7 @@ class ConfigProvider
             ],
             'factories'  => [
                 Tooling\CreateCrudHandlerCommand::class => Tooling\CreateCrudHandlerCommandFactory::class,
+                Tooling\CreateRouteCommand::class       => Tooling\CreateRouteCommandFactory::class,
                 FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,

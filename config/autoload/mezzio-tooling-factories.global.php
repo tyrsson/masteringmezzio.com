@@ -14,6 +14,7 @@ return [
     'dependencies' => [
         'factories' => [
             App\Handler\CrudHandler::class => App\Handler\CrudHandlerFactory::class,
+            App\Handler\TestAnotherHandler::class => App\Handler\TestAnotherHandlerFactory::class,
         ],
     ],
 ];
