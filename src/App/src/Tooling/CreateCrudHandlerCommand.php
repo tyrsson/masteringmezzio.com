@@ -339,7 +339,7 @@ class CreateCrudHandlerCommand extends Command
             '--no-route' => $input->getOption('no-route'),
             '--authorize-role' => $input->getOption('authorize-role'),
         ]);
-        $command = $this->getApplication()->find('mezzio:route:create');
+        $command    = $this->getApplication()->find('mezzio:route:create');
         return $command->run($routeInput, $output);
     }
 

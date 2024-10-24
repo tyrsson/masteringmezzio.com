@@ -7,14 +7,12 @@
  * removing factory definitions; other dependency types may be overwritten
  * when regenerating this file via mezzio-tooling commands.
  */
- 
+
 declare(strict_types=1);
 
 return [
     'dependencies' => [
         'factories' => [
-            App\Handler\CrudHandler::class => App\Handler\CrudHandlerFactory::class,
-            App\Handler\TestAnotherHandler::class => App\Handler\TestAnotherHandlerFactory::class,
         ],
     ],
 ];
