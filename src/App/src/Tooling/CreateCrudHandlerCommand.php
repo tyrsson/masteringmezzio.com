@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tooling;
 
 use App\Tooling\ClassSkeletons;
+use App\Tooling\CreateTemplate;
 use Mezzio\Tooling\CreateHandler\CreateHandler;
-use Mezzio\Tooling\CreateHandler\CreateTemplate;
 use Mezzio\Tooling\TemplateResolutionTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -20,6 +20,7 @@ use function sprintf;
 
 class CreateCrudHandlerCommand extends Command
 {
+    use ConfigInjectionDelegatorDetectorTrait;
     use TemplateResolutionTrait;
 
     /**
@@ -68,6 +69,12 @@ class CreateCrudHandlerCommand extends Command
         registration of the generated factory with the container.
         EOT;
 
+    public const HELP_OPT_NO_ROUTE = <<<'EOT'
+        By default when this command generates a handler it creates and registers a
+        route in the container. Passing this option disables route creation and
+        registration with the container.
+        EOT;
+
     /**
      * @var string
      */
@@ -112,6 +119,11 @@ class CreateCrudHandlerCommand extends Command
         --without-template is provided, this option is ignored.
         EOT;
 
+    public const HELP_OPT_AUTHZ_ROLE = <<<'EOT'
+        The minimum RBAC role you would like to authorize for this route if any.
+        Defaults to Guest. Valid options are Guest, User, Administrator.
+        EOT;
+
     /**
      * @var string
      */
@@ -148,6 +160,11 @@ class CreateCrudHandlerCommand extends Command
     private bool $templateRendererIsRegistered = false;
 
     /**
+     * Whether or not the ApplicationConfigInjectionDelegator is registered with the container
+     */
+    private bool $configDelegatorisRegistered = false;
+
+    /**
      * Root path of the project. Defaults to getcwd(). Mainly exists for
      * testing purposes, to allow injecting a virtual filesystem location.
      */
@@ -155,7 +172,8 @@ class CreateCrudHandlerCommand extends Command
         private ContainerInterface $container,
         private string $projectRoot
     ) {
-        $this->rendererIsRegistered = $this->containerDefinesRendererService($container);
+        $this->rendererIsRegistered        = $this->containerDefinesRendererService($container);
+        $this->configDelegatorisRegistered = $this->delegatorIsRegistered($container);
 
         // Must do last, so that container and/or project root are in scope
         // when configure() is called.
@@ -172,6 +190,8 @@ class CreateCrudHandlerCommand extends Command
         $this->addArgument('handler', InputArgument::REQUIRED, self::HELP_ARG_HANDLER);
         $this->addOption('no-factory', null, InputOption::VALUE_NONE, self::HELP_OPT_NO_FACTORY);
         $this->addOption('no-register', null, InputOption::VALUE_NONE, self::HELP_OPT_NO_REGISTER);
+        $this->addOption('no-route', null, InputOption::VALUE_NONE, self::HELP_OPT_NO_ROUTE);
+        $this->addOption('authorize-role', 'rbac', InputOption::VALUE_OPTIONAL, self::HELP_OPT_AUTHZ_ROLE, 'Guest');
 
         $this->configureTemplateOptions();
     }
@@ -260,6 +280,18 @@ class CreateCrudHandlerCommand extends Command
             );
         }
 
+        if (
+            $this->configDelegatorisRegistered
+            && ! $input->getOption(('no-route'))
+        ) {
+            $result = $this->generateRoute(
+                $handler,
+                $templateName,
+                $input,
+                $output
+            );
+        }
+
         if (! $input->getOption('no-factory')) {
             return $this->generateFactory($handler, $path, $input, $output);
         }
@@ -292,6 +324,23 @@ class CreateCrudHandlerCommand extends Command
             $template->getName(),
             $template->getPath()
         ));
+    }
+
+    private function generateRoute(
+        string $handlerClass,
+        string $templateName,
+        InputInterface $input,
+        OutputInterface $output
+    ) {
+        $routeInput = new ArrayInput([
+            'command'    => 'mezzio:route:create',
+            'handler'    => $handlerClass,
+            'route-name' => $templateName,
+            '--no-route' => $input->getOption('no-route'),
+            '--authorize-role' => $input->getOption('authorize-role'),
+        ]);
+        $command    = $this->getApplication()->find('mezzio:route:create');
+        return $command->run($routeInput, $output);
     }
 
     private function generateFactory(

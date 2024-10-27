@@ -77,10 +77,14 @@ class ClassSkeletons
 
             public function handleGet(ServerRequestInterface $request): ResponseInterface
             {
+                $data = [
+                    'title' => '%template-name%',
+                ];
                 $model = $request->getAttribute(ModelInterface::class);
+                $model->setVariables($data);
                 return new HtmlResponse($this->renderer->render(
                     '%template-namespace%::%template-name%',
-                    $model // htmx model
+                    $model
                 ));
             }
 
