@@ -19,6 +19,7 @@ final class ChangePasswordFieldset extends PasswordFieldset
 
     public function init(): void
     {
+        parent::init();
         $this->add([
             'name' => 'current_password',
             'type' => Password::class,
