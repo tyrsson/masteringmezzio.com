@@ -14,7 +14,7 @@ use Laminas\Validator\Identical;
 use Laminas\Validator\StringLength;
 use Webinertia\Validator\Password as PasswordValidator;
 
-final class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
+class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
 {
     /**
      * @param mixed $name
@@ -22,7 +22,7 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
      * @return void
      * @throws InvalidArgumentException
      */
-    public function __construct(array $config, $name = 'acct-data', $options = [])
+    public function __construct($name = 'acct-data', $options = [])
     {
         parent::__construct($name, $options);
     }
@@ -48,6 +48,7 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
 
     public function getInputFilterSpecification(): array
     {
+        $options = $this->getOptions();
         return [
             [
                 'name'       => 'password',
@@ -68,11 +69,7 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
                     [
                         'name' => PasswordValidator::class,
                         'options' => [
-                            'length'  => 8, // overall length of password
-                            'upper'   => 1, // uppercase count
-                            'lower'   => 2, // lowercase count
-                            'digit'   => 2, // digit count
-                            'special' => 2, // special char count
+                            $options['password_options'],
                         ],
                     ],
                 ],
