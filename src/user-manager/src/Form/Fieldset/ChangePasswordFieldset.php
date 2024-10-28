@@ -7,7 +7,6 @@ namespace UserManager\Form\Fieldset;
 use Laminas\Filter\StringTrim;
 use Laminas\Filter\StripTags;
 use Laminas\Form\Element\Password;
-use Laminas\Validator\Identical;
 use Laminas\Validator\StringLength;
 use Webinertia\Validator\Password as PasswordValidator;
 
@@ -35,7 +34,7 @@ final class ChangePasswordFieldset extends PasswordFieldset
         $spec    = parent::getInputFilterSpecification();
         $options = $this->getOptions();
         $spec[] = [
-            'name'       => 'password',
+            'name'       => 'current_password',
             'required'   => true,
             'filters'    => [
                 ['name' => StripTags::class],
