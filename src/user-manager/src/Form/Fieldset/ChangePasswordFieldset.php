@@ -26,7 +26,7 @@ final class ChangePasswordFieldset extends PasswordFieldset
             'options' => [
                 'label' => 'Password',
             ],
-            'order' => 1,
+            ['priority' => 1],
         ]);
     }
 
