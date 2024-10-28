@@ -34,7 +34,7 @@ final class ChangePasswordFieldset extends PasswordFieldset
     {
         $spec    = parent::getInputFilterSpecification();
         $options = $this->getOptions();
-        $spec[] = [
+        $spec[]  = [
             'name'       => 'current_password',
             'required'   => true,
             'filters'    => [
