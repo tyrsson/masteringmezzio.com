@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace UserManager\Form\Fieldset;
 
+use Laminas\Db\Adapter\AdapterAwareInterface;
+use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\Filter\StringTrim;
 use Laminas\Filter\StripTags;
 use Laminas\Form\Element\Password;
@@ -12,6 +14,12 @@ use Webinertia\Validator\Password as PasswordValidator;
 
 final class ChangePasswordFieldset extends PasswordFieldset
 {
+    use AdapterAwareTrait;
+
+    private string $tableName;
+    private string $columnName;
+    private array  $passwordOptions;
+
     public function __construct($name = 'acct-data', $options = [])
     {
         parent::__construct($name, $options);
@@ -20,14 +28,16 @@ final class ChangePasswordFieldset extends PasswordFieldset
     public function init(): void
     {
         parent::init();
-        $this->add([
-            'name' => 'current_password',
-            'type' => Password::class,
-            'options' => [
-                'label' => 'Password',
+        $this->add(
+            [
+                'name' => 'current_password',
+                'type' => Password::class,
+                'attributes' => [
+                    'placeholder' => 'Current Password',
+                ],
             ],
-            ['priority' => 1],
-        ]);
+            ['priority' => 1]
+        );
     }
 
     public function getInputFilterSpecification(): array

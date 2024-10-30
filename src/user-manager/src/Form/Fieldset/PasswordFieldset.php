@@ -33,15 +33,15 @@ class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
         $this->add([
             'name'    => 'password',
             'type'    => Password::class,
-            'options' => [
-                'label' => 'Password',
+            'attributes' => [
+                'placeholder' => 'Password',
             ],
         ]);
         $this->add([
             'name'    => 'conf_password',
             'type'    => Password::class,
-            'options' => [
-                'label' => 'Confirm Password',
+            'attributes' => [
+                'placeholder' => 'Confirm Password',
             ],
         ]);
     }

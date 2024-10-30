@@ -157,13 +157,16 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Form\Fieldset\AcctDataFieldset::class      => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
-                Form\Fieldset\ResendVerification::class    => InvokableFactory::class,
-                Form\Login::class                          => Form\LoginFactory::class,
-                Form\Register::class                       => Form\RegisterFactory::class,
-                Form\ResendVerification::class             => Form\ResendVerificationFactory::class,
-                Form\ResetPassword::class                  => Form\ResetPasswordFactory::class,
-                Form\Fieldset\ResetPasswordFieldset::class => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
+                Form\Fieldset\AcctDataFieldset::class       => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\Fieldset\ChangePasswordFieldset::class => Form\Fieldset\Factory\PasswordFieldsetFactory::class,
+                Form\Fieldset\PasswordFieldset::class       => Form\Fieldset\Factory\PasswordFieldsetFactory::class,
+                Form\Fieldset\ResendVerification::class     => InvokableFactory::class,
+                Form\ChangePassword::class                  => Form\ChangePasswordFactory::class,
+                Form\Login::class                           => Form\LoginFactory::class,
+                Form\Register::class                        => Form\RegisterFactory::class,
+                Form\ResendVerification::class              => Form\ResendVerificationFactory::class,
+                Form\ResetPassword::class                   => Form\ResetPasswordFactory::class,
+                Form\Fieldset\ResetPasswordFieldset::class  => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
             ],
         ];
     }

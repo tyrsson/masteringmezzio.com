@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace UserManager\Form\Fieldset\Factory;
 
 use App\ConfigProvider as AppProvider;
+use Laminas\Db\Adapter\AdapterAwareInterface;
+use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Psr\Container\ContainerInterface;
 use UserManager\Form\Fieldset\ChangePasswordFieldset;
@@ -16,10 +18,17 @@ final class PasswordFieldsetFactory implements FactoryInterface
     /** @inheritDoc */
     public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): PasswordFieldset|ChangePasswordFieldset
     {
-        return new $requestedName(
+        $passwordOptions = $container->get('config')[AppProvider::APP_SETTINGS_KEY][Password::class]['options'];
+        $instance = new $requestedName(
             options: [
-                'password_options' => $container->get('config')[AppProvider::APP_SETTINGS_KEY][Password::class]['options']
+                'password_options' => $passwordOptions
             ]
         );
+
+        if ($instance instanceof AdapterAwareInterface) {
+            $instance->setDbAdapter($container->get(AdapterInterface::class));
+        }
+
+        return $instance;
     }
 }
