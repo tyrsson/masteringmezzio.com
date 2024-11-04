@@ -6,9 +6,9 @@ namespace UserManager\Form;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
 use Htmx\Form\HtmxTrait;
+use Laminas\Form\Element\Submit;
 use Laminas\Form\Form;
 use UserManager\Form\Fieldset;
-use UserManager\Form\Fieldset\ChangePasswordFieldset;
 
 final class ChangePassword extends Form
 {
@@ -23,15 +23,25 @@ final class ChangePassword extends Form
     {
         $options = $this->getOptions();
         $this->setAttributes([
-            'action' => $this->urlHelper->generate('Change Password'),
+            'action' => $this->urlHelper->generate(
+                routeName: 'Change Password',
+                //options: ['reuse_result_params' => false]
+            ),
             'method' => Http::METHOD_POST,
         ]);
         $this->add([
             'name' => 'acct-data',
-            'type' => ChangePasswordFieldset::class,
+            'type' => Fieldset\ChangePasswordFieldset::class,
             'options' => [
                 'use_as_base_fieldset' => true,
-                'password_options'     => $options['password_options'],
+                'password_options'     => $options['password_options']
+            ]
+        ]);
+        $this->add([
+            'name' => 'Submit',
+            'type' => Submit::class,
+            'attributes' => [
+                'value' => 'Submit',
             ]
         ]);
     }

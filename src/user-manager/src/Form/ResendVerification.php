@@ -7,8 +7,6 @@ namespace UserManager\Form;
 use Laminas\Form;
 use Htmx\Form\HtmxTrait;
 
-
-
 final class ResendVerification extends Form\Form
 {
     use HtmxTrait;

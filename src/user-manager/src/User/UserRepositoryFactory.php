@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\UserRepository;
+namespace UserManager\User;
 
 use Axleus\Db;
 use Laminas\Db\Adapter\AdapterInterface;
@@ -11,12 +11,12 @@ use Laminas\Hydrator\ArraySerializableHydrator;
 use Mezzio\Authentication\UserInterface;
 use Psr\Container\ContainerInterface;
 
-final class TableGatewayFactory
+final class UserRepositoryFactory
 {
-    public function __invoke(ContainerInterface $container): TableGateway
+    public function __invoke(ContainerInterface $container): UserRepository
     {
         $hydrator = new ArraySerializableHydrator();
-        return new TableGateway(
+        return new UserRepository(
             gateway: new Db\TableGateway(
                 'users',
                 $container->get(AdapterInterface::class),

@@ -7,13 +7,13 @@ namespace UserManager\Form;
 use App\ConfigProvider as AppProvider;
 use Mezzio\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
-use Webinertia\Validator\Password;
+use Webinertia\Validator\PasswordRequirement;
 
 final class ChangePasswordFactory
 {
     public function __invoke(ContainerInterface $container): ChangePassword
     {
-        $passwordOptions = $container->get('config')[AppProvider::APP_SETTINGS_KEY][Password::class]['options'];
+        $passwordOptions = $container->get('config')[AppProvider::APP_SETTINGS_KEY][PasswordRequirement::class]['options'];
         $form = new ChangePassword(
             options: [
                 'password_options' => $passwordOptions,

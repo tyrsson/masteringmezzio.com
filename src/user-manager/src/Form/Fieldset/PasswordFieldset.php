@@ -9,10 +9,12 @@ use Laminas\Filter\StripTags;
 use Laminas\Form\Element\Password;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\Fieldset;
+use Laminas\Hydrator\ArraySerializableHydrator;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator\Identical;
 use Laminas\Validator\StringLength;
-use Webinertia\Validator\Password as PasswordValidator;
+use UserManager\User\UserEntity;
+use Webinertia\Validator\PasswordRequirement;
 
 class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
 {
@@ -29,17 +31,18 @@ class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
 
     public function init(): void
     {
-
+        $this->setObject(new UserEntity());
+        $this->setHydrator(new ArraySerializableHydrator());
         $this->add([
-            'name'    => 'password',
-            'type'    => Password::class,
+            'name'       => 'password',
+            'type'       => Password::class,
             'attributes' => [
                 'placeholder' => 'Password',
             ],
         ]);
         $this->add([
-            'name'    => 'conf_password',
-            'type'    => Password::class,
+            'name'       => 'conf_password',
+            'type'       => Password::class,
             'attributes' => [
                 'placeholder' => 'Confirm Password',
             ],
@@ -51,9 +54,9 @@ class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
         $options = $this->getOptions();
         return [
             [
-                'name'       => 'password',
-                'required'   => true,
-                'filters'    => [
+                'name'     => 'password',
+                'required' => true,
+                'filters'  => [
                     ['name' => StripTags::class],
                     ['name' => StringTrim::class],
                 ],
@@ -67,17 +70,15 @@ class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
                         ],
                     ],
                     [
-                        'name' => PasswordValidator::class,
-                        'options' => [
-                            $options['password_options'],
-                        ],
+                        'name'    => PasswordRequirement::class,
+                        'options' => $options['password_options'],
                     ],
                 ],
             ],
             [
-                'name'       => 'conf_password',
-                'required'   => true,
-                'filters'    => [
+                'name'     => 'conf_password',
+                'required' => true,
+                'filters'  => [
                     ['name' => StripTags::class],
                     ['name' => StringTrim::class],
                 ],

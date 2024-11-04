@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\UserRepository;
+namespace UserManager\User;
 
 use ArrayObject;
 use Axleus\Db;

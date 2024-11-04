@@ -9,7 +9,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Element;
 use Laminas\Hydrator\ArraySerializableHydrator;
 use Laminas\InputFilter\InputFilterProviderInterface;
-use UserManager\UserRepository\UserEntity;
+use UserManager\User\UserEntity;
 use Webinertia\Filter\Uuid;
 
 final class ResendVerification extends Fieldset implements InputFilterProviderInterface

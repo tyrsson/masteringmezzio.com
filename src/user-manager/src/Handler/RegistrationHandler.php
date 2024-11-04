@@ -24,7 +24,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\ConfigProvider;
 use UserManager\Form\Register;
 use UserManager\Helper\VerificationHelper;
-use UserManager\UserRepository\TableGateway;
+use UserManager\User\UserRepository;
 use Webinertia\Filter\PasswordHash;
 
 use function sprintf;
@@ -35,7 +35,7 @@ class RegistrationHandler implements RequestHandlerInterface
 
     public function __construct(
         private TemplateRendererInterface $renderer,
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private UserRepositoryInterface&UserRepository $userRepositoryInterface,
         private Register $form,
         private UrlHelper $urlHelper,
         private array $config

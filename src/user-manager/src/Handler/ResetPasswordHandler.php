@@ -6,7 +6,6 @@ namespace UserManager\Handler;
 
 use App\HandlerTrait;
 use App\SystemMessageInterface;
-use Axleus\Db\EntityInterface;
 use Htmx\HtmxHandlerTrait;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Form\Exception\InvalidArgumentException;
@@ -29,7 +28,8 @@ use Throwable;
 use UserManager\ConfigProvider;
 use UserManager\Form\ResetPassword;
 use UserManager\Helper\VerificationHelper;
-use UserManager\UserRepository\TableGateway;
+use UserManager\User\UserEntity;
+use UserManager\User\UserRepository;
 
 class ResetPasswordHandler implements RequestHandlerInterface
 {
@@ -40,7 +40,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
 
     public function __construct(
         private TemplateRendererInterface $renderer,
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private UserRepositoryInterface&UserRepository $userRepositoryInterface,
         private UrlHelper $url,
         private VerificationHelper $verifyHelper,
         private ResetPassword $form,

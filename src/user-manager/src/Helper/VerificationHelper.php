@@ -11,8 +11,8 @@ use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Router\RouteResult;
 use Psr\Http\Message\ServerRequestInterface;
 use UserManager\ConfigProvider;
-use UserManager\UserRepository\TableGateway;
-use UserManager\UserRepository\UserEntity;
+use UserManager\User\UserRepository;
+use UserManager\User\UserEntity;
 use UserManager\Validator\UuidV7TokenValidator as TokenValidator;
 
 final class VerificationHelper
@@ -24,7 +24,7 @@ final class VerificationHelper
     private UserEntity $target;
 
     public function __construct(
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private UserRepositoryInterface&UserRepository $userRepositoryInterface,
         private array $config
     ) {
     }
@@ -32,7 +32,8 @@ final class VerificationHelper
     public function verifyToken(
         ServerRequestInterface $request,
         ?string $type = self::VERIFICATION_TOKEN,
-        ?string $tokenLifetime = null
+        ?string $tokenLifetime = null,
+        ?bool   $returnTarget = false
     ): UserEntity|bool {
         $routeResult   = $request->getAttribute(RouteResult::class);
         $matchedParams = $routeResult->getMatchedParams();
@@ -48,6 +49,7 @@ final class VerificationHelper
                         'max_lifetime' => $tokenLifetime ?? $this->config[ConfigProvider::TOKEN_KEY][$type],
                     ]);
                 if ($tokenValidator->isValid($this->target->offsetGet($type))) {
+                    $data = $this->target->getArrayCopy();
                     $now                 = new DateTimeImmutable();
                     $data['dateUpdated'] = $now->format($this->config['app_settings']['datetime_format']);
                     if ($type === self::VERIFICATION_TOKEN) {
@@ -57,7 +59,10 @@ final class VerificationHelper
                     $data[$type] = null;
                     $this->target->exchangeArray($data);
                     $this->target = $this->userRepositoryInterface->save($this->target, 'id');
-                    return $this->target;
+                    if ($returnTarget) {
+                        return $this->target;
+                    }
+                    return true;
                 }
             }
         } catch (\Throwable $th) {

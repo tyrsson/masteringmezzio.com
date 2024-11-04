@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace UserManager\Form\Fieldset;
 
-use Laminas\Db\Adapter\AdapterAwareInterface;
 use Laminas\Db\Adapter\AdapterAwareTrait;
 use Laminas\Filter\StringTrim;
 use Laminas\Filter\StripTags;
+use Laminas\Form\Element\Hidden;
 use Laminas\Form\Element\Password;
 use Laminas\Validator\StringLength;
-use Webinertia\Validator\Password as PasswordValidator;
+use Webinertia\Validator\DbStoredPassword;
 
 final class ChangePasswordFieldset extends PasswordFieldset
 {
@@ -19,6 +19,7 @@ final class ChangePasswordFieldset extends PasswordFieldset
     private string $tableName;
     private string $columnName;
     private array  $passwordOptions;
+    private bool   $hasValidToken = false;
 
     public function __construct($name = 'acct-data', $options = [])
     {
@@ -28,6 +29,15 @@ final class ChangePasswordFieldset extends PasswordFieldset
     public function init(): void
     {
         parent::init();
+
+        $this->add([
+            'name' => 'id',
+            'type' => Hidden::class,
+        ]);
+        $this->add([
+            'name' => 'isTokenReset',
+            'type' => Hidden::class,
+        ]);
         $this->add(
             [
                 'name' => 'current_password',
@@ -42,28 +52,24 @@ final class ChangePasswordFieldset extends PasswordFieldset
 
     public function getInputFilterSpecification(): array
     {
-        $spec    = parent::getInputFilterSpecification();
         $options = $this->getOptions();
-        $spec[]  = [
+        $spec    = parent::getInputFilterSpecification();
+        $spec[] = [
             'name'       => 'current_password',
-            'required'   => true,
+            'required'   => false,
+            'allow_empty' => true,
             'filters'    => [
                 ['name' => StripTags::class],
                 ['name' => StringTrim::class],
             ],
             'validators' => [
                 [
-                    'name'    => StringLength::class,
+                    'name'    => DbStoredPassword::class,
                     'options' => [
-                        'encoding' => 'UTF-8',
-                        'min'      => 1,
-                        'max'      => 100,
-                    ],
-                ],
-                [
-                    'name' => PasswordValidator::class,
-                    'options' => [
-                        $options['password_options'],
+                        'table'    => 'users',
+                        'pkColumn' => 'id',
+                        'pkValue'  => $options['userId'],
+                        'password_column' => 'password',
                     ],
                 ],
             ],

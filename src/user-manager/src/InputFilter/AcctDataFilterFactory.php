@@ -8,7 +8,7 @@ use App\ConfigProvider as AppProvider;
 use Laminas\Db\Adapter\AdapterInterface;
 use Psr\Container\ContainerInterface;
 use UserManager\ConfigProvider;
-use Webinertia\Validator\Password;
+use Webinertia\Validator\PasswordRequirement;
 
 final class AcctDataFilterFactory
 {
@@ -18,7 +18,7 @@ final class AcctDataFilterFactory
         $filter = new AcctDataFilter(
             $config[ConfigProvider::class][ConfigProvider::USERMANAGER_TABLE_NAME],
             $config['authentication']['username'],
-            $config[AppProvider::APP_SETTINGS_KEY][Password::class]['options']
+            $config[AppProvider::APP_SETTINGS_KEY][PasswordRequirement::class]['options']
         );
         $filter->setDbAdapter($container->get(AdapterInterface::class));
         return $filter;

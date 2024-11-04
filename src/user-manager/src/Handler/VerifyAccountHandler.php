@@ -23,7 +23,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use UserManager\ConfigProvider;
 use UserManager\Form\ResendVerification;
 use UserManager\Helper\VerificationHelper;
-use UserManager\UserRepository\TableGateway;
+use UserManager\User\UserRepository;
 use UserManager\UserRepository\UserEntity;
 
 class VerifyAccountHandler implements RequestHandlerInterface
@@ -32,7 +32,7 @@ class VerifyAccountHandler implements RequestHandlerInterface
 
     public function __construct(
         private TemplateRendererInterface $renderer,
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private UserRepositoryInterface&UserRepository $userRepositoryInterface,
         private MailerInterface&Mailer $mailer,
         private VerificationHelper $verifyHelper,
         private ResendVerification $form,
@@ -40,7 +40,6 @@ class VerifyAccountHandler implements RequestHandlerInterface
         private array $config
     ) {
     }
-
 
     public function handleGet(ServerRequestInterface $request): ResponseInterface
     {

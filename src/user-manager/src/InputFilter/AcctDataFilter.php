@@ -10,7 +10,7 @@ use Laminas\InputFilter\InputFilter;
 use Laminas\Filter;
 use Laminas\Validator;
 use Webinertia\Filter\Uuid;
-use Webinertia\Validator\Password;
+use Webinertia\Validator\PasswordRequirement;
 
 class AcctDataFilter extends InputFilter implements AdapterAwareInterface
 {
@@ -132,7 +132,7 @@ class AcctDataFilter extends InputFilter implements AdapterAwareInterface
                         ],
                     ],
                     [
-                        'name' => Password::class,
+                        'name' => PasswordRequirement::class,
                         'options' => $this->passwordConfig,
                     ],
                 ],

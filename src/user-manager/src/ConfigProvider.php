@@ -18,7 +18,7 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-use Webinertia\Validator\Password;
+use Webinertia\Validator\PasswordRequirement;
 
 final class ConfigProvider
 {
@@ -63,7 +63,7 @@ final class ConfigProvider
                 'verificationToken'   => '1 Hour',
                 'passwordResetToken'  => '1 Hour',
             ],
-            Password::class => [
+            PasswordRequirement::class => [
                 'options' => [
                     'length'  => 8, // overall length of password
                     'upper'   => 1, // uppercase count
@@ -97,11 +97,11 @@ final class ConfigProvider
             'permissions' => [
                 'Guest' => [
                     'Home',
+                    'Change Password',
                     'Login',
                     'Register',
                     'Reset Password',
                     'Verify Account',
-                    'Change Password',
                 ],
                 'User'  => [
                     'Logout',
@@ -120,7 +120,7 @@ final class ConfigProvider
                 AuthenticationInterface::class       => PhpSession::class,
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
-                UserRepositoryInterface::class       => UserRepository\TableGateway::class,
+                UserRepositoryInterface::class       => User\UserRepository::class,
             ],
             'delegators' => [
                 Application::class => [
@@ -128,6 +128,7 @@ final class ConfigProvider
                 ],
             ],
             'factories'  => [
+                AuthorizationMiddleware::class       => Middleware\AuthorizationMiddlewareFactory::class,
                 Authz\Rbac::class                    => Authz\RbacFactory::class,
                 Authz\UserAssertion::class           => InvokableFactory::class,
                 Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
@@ -139,7 +140,7 @@ final class ConfigProvider
                 Handler\VerifyAccountHandler::class  => Handler\VerifyAccountHandlerFactory::class,
                 Helper\VerificationHelper::class     => Helper\VerificationHelperFactory::class,
                 Middleware\IdentityMiddleware::class => Middleware\IdentityMiddlewareFactory::class,
-                UserRepository\TableGateway::class   => UserRepository\TableGatewayFactory::class,
+                User\UserRepository::class           => User\UserRepositoryFactory::class,
             ],
         ];
     }
