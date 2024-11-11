@@ -95,7 +95,6 @@ class ConfigProvider
             'factories'  => [
                 Tooling\CreateCrudHandlerCommand::class => Tooling\CreateCrudHandlerCommandFactory::class,
                 Tooling\CreateRouteCommand::class       => Tooling\CreateRouteCommandFactory::class,
-                FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,
                 Middleware\AjaxRequestMiddleware::class => Middleware\AjaxRequestMiddlewareFactory::class,

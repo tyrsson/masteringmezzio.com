@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace UserManager;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
-
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Mailer\ConfigProvider as MailConfigProvider;
 use Mailer\Adapter\AdapterInterface;
@@ -119,11 +118,10 @@ final class ConfigProvider
     {
         return [
             'aliases'    => [
-                AuthenticationInterface::class                  => PhpSession::class,
-                AuthorizationInterface::class                   => Authz\Rbac::class,
-                LaminasRbacAssertionInterface::class            => Authz\UserAssertion::class,
-                UserRepositoryInterface::class                  => User\UserRepository::class,
-
+                AuthenticationInterface::class       => PhpSession::class,
+                AuthorizationInterface::class        => Authz\Rbac::class,
+                LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
+                UserRepositoryInterface::class       => User\UserRepository::class,
             ],
             'delegators' => [
                 Application::class => [
@@ -142,7 +140,7 @@ final class ConfigProvider
                 Handler\ResetPasswordHandler::class      => Handler\ResetPasswordHandlerFactory::class,
                 Handler\VerifyAccountHandler::class      => Handler\VerifyAccountHandlerFactory::class,
                 Helper\VerificationHelper::class         => Helper\VerificationHelperFactory::class,
-                User\Listener\MessageListener::class     => User\Listener\MessageListenerFactory::class,
+                Message\Listener\MessageListener::class  => Message\Listener\MessageListenerFactory::class,
                 Middleware\IdentityMiddleware::class     => Middleware\IdentityMiddlewareFactory::class,
                 User\UserRepository::class               => User\UserRepositoryFactory::class,
             ],
@@ -203,7 +201,7 @@ final class ConfigProvider
     {
         return [
             [
-                'listener' => User\Listener\MessageListener::class,
+                'listener' => Message\Listener\MessageListener::class,
                 //'priority' => 0,
             ]
         ];

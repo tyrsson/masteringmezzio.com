@@ -54,9 +54,9 @@ class ConfigProvider
                 MessageListener::class                   => MessageListenerFactory::class,
                 Middleware\MessageMiddleware::class      => Middleware\MessageMiddlewareFactory::class,
             ],
-            'initializers' => [
-                Container\EventManagerInitializer::class,
-            ],
+            // 'initializers' => [
+            //     Container\EventManagerInitializer::class,
+            // ],
         ];
     }
 

@@ -6,10 +6,6 @@ namespace Message;
 
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
-use Laminas\EventManager\EventInterface;
-use Mailer\Adapter\AdapterInterface;
-use Mailer\ConfigProvider as MailConfigProvider;
-use Mailer\Event\MessageEvent as EmailMessage;
 use Mailer\MailerInterface;
 use Mezzio\Helper\UrlHelper;
 
@@ -32,7 +28,7 @@ final class MessageListener extends AbstractListenerAggregate
     {
         //$this->listeners[] = $events->attach(Message::Email->value, [$this, 'onEmailMessage'], $priority);
         $this->listeners[] = $events->attach(
-            Event\SystemMessage::EVENT_SYSTEM_MESSAGE,
+            SystemMessage::EVENT_SYSTEM_MESSAGE,
             [$this, 'onSystemMessage'],
             $priority
         );
@@ -41,13 +37,13 @@ final class MessageListener extends AbstractListenerAggregate
     /**
      * Setup the generic SystemMessenger
      */
-    public function onSystemMessage(Event\SystemMessage $e): void
+    public function onSystemMessage(SystemMessage $e): void
     {
-        $message = $e->getMessage() ?? static::DEFAULT_MESSAGE;
-        if ($e->now()) {
-            $this->messenger->sendNow($e->getKey(), $message, $e->getHops());
+        $message = $e->getSystemMessage() ?? static::DEFAULT_MESSAGE;
+        if ($e->getNow()) {
+            $this->messenger->sendNow($e->getSystemMessageKey(), $message, $e->getHops());
         } else {
-            $this->messenger->send($e->getKey(), $message, $e->getHops());
+            $this->messenger->send($e->getSystemMessageKey(), $message, $e->getHops());
         }
     }
 
