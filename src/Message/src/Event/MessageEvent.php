@@ -10,7 +10,6 @@ use Webmozart\Assert\Assert;
 
 class MessageEvent extends Event
 {
-    public final const EVENT_UI_MESSAGE    = 'uiMessage';
     public final const EVENT_EMAIL_MESSAGE = 'emailMessage';
 
     public bool $notify = false;

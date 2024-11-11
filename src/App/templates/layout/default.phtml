@@ -34,11 +34,19 @@ $this->headScript()
         'crossorigin' => 'anonymous',
     ],
 );
+
 // $this->headScript()->appendScript(
 //     "htmx.config = '$this->htmxConfig'",
 //     '',
 //     ['noescape' => true]
 // );
+if ($this->config['debug']) {
+    $this->headScript()
+        ->appendFile(
+        $this->basePath('front-end/js/debug.js'),
+        'text/javascript',
+    );
+}
 
 // inline script which is printed at bottom of page
 $this->inlineScript()

@@ -6,6 +6,7 @@ use App\Middleware\AjaxRequestMiddleware;
 use App\Middleware\TemplateMiddleware;
 use Htmx\Middleware\HtmxMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;
+use Message\Middleware\MessageMiddleware;
 use Mezzio\Application;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Flash\FlashMessageMiddleware;
@@ -20,7 +21,6 @@ use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Mezzio\Session\SessionMiddleware;
 use Psr\Container\ContainerInterface;
-use UserManager\Middleware\EventManagerMiddleware;
 use UserManager\Middleware\IdentityMiddleware;
 
 /**
@@ -50,10 +50,9 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - $app->pipe('/api', $apiMiddleware);
     // - $app->pipe('/docs', $apiDocMiddleware);
     // - $app->pipe('/files', $filesMiddleware);
-    $app->pipe(EventManagerMiddleware::class);
     $app->pipe(SessionMiddleware::class);
-    $app->pipe(FlashMessageMiddleware::class);
     $app->pipe(IdentityMiddleware::class);
+    $app->pipe(MessageMiddleware::class);
     $app->pipe(AjaxRequestMiddleware::class); // possible removal
 
     // Register the routing middleware in the middleware pipeline.

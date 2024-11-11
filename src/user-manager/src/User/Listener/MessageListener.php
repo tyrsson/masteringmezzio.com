@@ -9,7 +9,7 @@ use Laminas\EventManager\EventManagerInterface;
 use Mailer\Adapter\AdapterInterface;
 use Mailer\ConfigProvider as MailConfigProvider;
 use Mailer\MailerInterface;
-use Message\Event\MessageEvent;
+use Message\Event\SystemMessage;
 use Mezzio\Helper\UrlHelper;
 use UserManager\ConfigProvider;
 use UserManager\User\Event;
@@ -17,6 +17,9 @@ use UserManager\Helper\VerificationHelper;
 
 final class MessageListener extends AbstractListenerAggregate
 {
+    private const NOTIFY_MESSAGE = <<<'EOM'
+    Verification email sent!
+    EOM;
     private EventManagerInterface $events;
 
     public function __construct(
@@ -90,9 +93,13 @@ final class MessageListener extends AbstractListenerAggregate
 
     public function onNotifyEmailSent(Event\VerificationEmail $e)
     {
-        if ($e->getNotify() && $e->getNotificationBody() == null) {
-            // if we want a notification sent to the user but have not set a body trigger the generic
-            $result = $this->events->trigger(MessageEvent::EVENT_UI_MESSAGE, $e->getTarget(), $e->getParams());
+        if ($e->getNotify()) {
+            $systemMessage = new SystemMessage(SystemMessage::EVENT_SYSTEM_MESSAGE);
+            $systemMessage->setTarget($e->getTarget());
+            $systemMessage->setParams($e->getParams());
+            $systemMessage->setMessage($e->getNotificationBody() ?? static::NOTIFY_MESSAGE);
+            $systemMessage->setKey(Event\VerificationEmail::EVENT_VERIFY_ACCOUNT_EMAIL);
+            $result = $this->events->triggerEvent($systemMessage);
         }
     }
 }

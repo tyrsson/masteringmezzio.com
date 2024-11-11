@@ -22,9 +22,9 @@ class ConfigProvider
     public function __invoke() : array
     {
         return [
-            'dependencies' => $this->getDependencies(),
+            'dependencies'      => $this->getDependencies(),
             'message_listeners' => $this->getMessageListeners(),
-            'templates'    => $this->getTemplates(),
+            'templates'         => $this->getTemplates(),
         ];
     }
 
@@ -39,6 +39,7 @@ class ConfigProvider
                 'EventManager'                                  => EventManager\EventManager::class,
                 EventManager\SharedEventManagerInterface::class => EventManager\SharedEventManager::class,
                 'SharedEventManager'                            => EventManager\SharedEventManager::class,
+                SystemMessengerInterface::class                 => SystemMessenger::class,
             ],
             'delegators' => [
                 EventManager\EventManager::class => [
@@ -48,9 +49,10 @@ class ConfigProvider
             'invokables' => [
             ],
             'factories'  => [
-                EventManager\EventManager::class       => Container\EventManagerFactory::class,
-                EventManager\SharedEventManager::class => static fn() => new EventManager\SharedEventManager(),
-                MessageListener::class                 => MessageListenerFactory::class,
+                EventManager\EventManager::class         => Container\EventManagerFactory::class,
+                EventManager\SharedEventManager::class   => static fn() => new EventManager\SharedEventManager(),
+                MessageListener::class                   => MessageListenerFactory::class,
+                Middleware\MessageMiddleware::class      => Middleware\MessageMiddlewareFactory::class,
             ],
             'initializers' => [
                 Container\EventManagerInitializer::class,
@@ -61,10 +63,10 @@ class ConfigProvider
     public function getMessageListeners(): array
     {
         return [
-            [
-                'listener' => MessageListener::class,
-                'priority' => 1,
-            ],
+            // [
+            //     'listener' => MessageListener::class,
+            //     //'priority' => 1,
+            // ],
         ];
     }
 

@@ -6,6 +6,7 @@ namespace Message;
 
 use Mailer\MailerInterface;
 use Mezzio\Helper\UrlHelper;
+use Mezzio\Session\SessionPersistenceInterface;
 use Psr\Container\ContainerInterface;
 
 final class MessageListenerFactory

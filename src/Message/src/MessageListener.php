@@ -12,15 +12,15 @@ use Mailer\ConfigProvider as MailConfigProvider;
 use Mailer\Event\MessageEvent as EmailMessage;
 use Mailer\MailerInterface;
 use Mezzio\Helper\UrlHelper;
-use UserManager\ConfigProvider;
-use UserManager\Event\MessageEvent as UserMessage;
-use UserManager\Helper\VerificationHelper;
-use UserManager\User\Message;
 
 use function sprintf;
 
 final class MessageListener extends AbstractListenerAggregate
 {
+    private const DEFAULT_MESSAGE = 'The requested action was performed';
+
+    private SystemMessengerInterface $messenger;
+
     public function __construct(
         private MailerInterface $mailer,
         private UrlHelper $urlHelper,
@@ -32,14 +32,27 @@ final class MessageListener extends AbstractListenerAggregate
     {
         //$this->listeners[] = $events->attach(Message::Email->value, [$this, 'onEmailMessage'], $priority);
         $this->listeners[] = $events->attach(
-            Event\MessageEvent::EVENT_UI_MESSAGE,
-            [$this, 'onUiMessage'],
+            Event\SystemMessage::EVENT_SYSTEM_MESSAGE,
+            [$this, 'onSystemMessage'],
             $priority
         );
     }
 
-    public function onUiMessage(EventInterface $e)
+    /**
+     * Setup the generic SystemMessenger
+     */
+    public function onSystemMessage(Event\SystemMessage $e): void
     {
-        // handle ui messages via flash messages
+        $message = $e->getMessage() ?? static::DEFAULT_MESSAGE;
+        if ($e->now()) {
+            $this->messenger->sendNow($e->getKey(), $message, $e->getHops());
+        } else {
+            $this->messenger->send($e->getKey(), $message, $e->getHops());
+        }
+    }
+
+    public function setSystemMessenger(SystemMessengerInterface $systemMessengerInterface): void
+    {
+        $this->messenger = $systemMessengerInterface;
     }
 }

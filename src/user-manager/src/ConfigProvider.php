@@ -143,7 +143,6 @@ final class ConfigProvider
                 Handler\VerifyAccountHandler::class      => Handler\VerifyAccountHandlerFactory::class,
                 Helper\VerificationHelper::class         => Helper\VerificationHelperFactory::class,
                 User\Listener\MessageListener::class     => User\Listener\MessageListenerFactory::class,
-                Middleware\EventManagerMiddleware::class => Middleware\EventManagerMiddlewareFactory::class,
                 Middleware\IdentityMiddleware::class     => Middleware\IdentityMiddlewareFactory::class,
                 User\UserRepository::class               => User\UserRepositoryFactory::class,
             ],
