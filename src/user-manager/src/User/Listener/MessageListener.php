@@ -2,24 +2,23 @@
 
 declare(strict_types=1);
 
-namespace UserManager\User;
+namespace UserManager\User\Listener;
 
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Mailer\Adapter\AdapterInterface;
 use Mailer\ConfigProvider as MailConfigProvider;
-use Mailer\Event\MessageEvent as EmailMessage;
 use Mailer\MailerInterface;
+use Message\Event\MessageEvent;
 use Mezzio\Helper\UrlHelper;
 use UserManager\ConfigProvider;
-use UserManager\Event\MessageEvent as UserMessage;
+use UserManager\User\Event;
 use UserManager\Helper\VerificationHelper;
-use UserManager\User\Message;
-
-use function sprintf;
 
 final class MessageListener extends AbstractListenerAggregate
 {
+    private EventManagerInterface $events;
+
     public function __construct(
         private MailerInterface $mailer,
         private UrlHelper $urlHelper,
@@ -27,14 +26,26 @@ final class MessageListener extends AbstractListenerAggregate
     ) {
     }
 
+    /** attach listener methods */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        //$this->listeners[] = $events->attach(Message::Email->value, [$this, 'onEmailMessage'], $priority);
-        $this->listeners[] = $events->attach(Message::Ui->value, [$this, 'onUiMessage'], $priority);
-        $this->listeners[] = $events->attach(Message::VerifyAccount->value, [$this, 'onVerifyAccountMessage'], $priority);
+        $this->events = $events;
+
+        $this->listeners[] = $events->attach(
+            Event\VerificationEmail::EVENT_VERIFY_ACCOUNT_EMAIL,
+            [$this, 'onVerifyAccountEmail'],
+            $priority
+        );
+
+        $this->listeners[] = $events->attach(
+            Event\VerificationEmail::EVENT_VERIFY_ACCOUNT_EMAIL,
+            [$this, 'onNotifyEmailSent'],
+            0
+        );
     }
 
-    public function onVerifyAccountMessage(UserMessage $e)
+    /** listener method that will actually send the email */
+    public function onVerifyAccountEmail(Event\VerificationEmail $e)
     {
         $target = $e->getTarget();
         // handle email messages via mail adapter
@@ -68,14 +79,20 @@ final class MessageListener extends AbstractListenerAggregate
         );
         try {
             $status = $this->mailer?->send($adapter);
+            if ($status && ! $e->getNotify()) {
+                $e->stopPropagation();
+            }
             return $status;
         } catch (\Throwable $th) {
             throw $th;
         }
     }
 
-    public function onUiMessage(UserMessage $e)
+    public function onNotifyEmailSent(Event\VerificationEmail $e)
     {
-        // handle ui messages via flash messages
+        if ($e->getNotify() && $e->getNotificationBody() == null) {
+            // if we want a notification sent to the user but have not set a body trigger the generic
+            $result = $this->events->trigger(MessageEvent::EVENT_UI_MESSAGE, $e->getTarget(), $e->getParams());
+        }
     }
 }

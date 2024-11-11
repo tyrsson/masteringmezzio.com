@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace UserManager\User;
+namespace UserManager\User\Listener;
 
 use Mailer\MailerInterface;
 use Mezzio\Helper\UrlHelper;
