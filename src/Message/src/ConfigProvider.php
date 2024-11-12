@@ -25,6 +25,7 @@ class ConfigProvider
             'dependencies'      => $this->getDependencies(),
             'message_listeners' => $this->getMessageListeners(),
             'templates'         => $this->getTemplates(),
+            'view_helpers'      => $this->getViewHelpers(),
         ];
     }
 
@@ -54,20 +55,12 @@ class ConfigProvider
                 MessageListener::class                   => MessageListenerFactory::class,
                 Middleware\MessageMiddleware::class      => Middleware\MessageMiddlewareFactory::class,
             ],
-            // 'initializers' => [
-            //     Container\EventManagerInitializer::class,
-            // ],
         ];
     }
 
     public function getMessageListeners(): array
     {
-        return [
-            // [
-            //     'listener' => MessageListener::class,
-            //     //'priority' => 1,
-            // ],
-        ];
+        return [];
     }
 
     /**
@@ -78,6 +71,20 @@ class ConfigProvider
         return [
             'paths' => [
                 'message'    => [__DIR__ . '/../templates/'],
+            ],
+        ];
+    }
+
+    public function getViewHelpers(): array
+    {
+        return [
+            'aliases'   => [
+                'messenger'       => View\Helper\SystemMessenger::class,
+                'systemMessage'   => View\Helper\SystemMessenger::class,
+                'systemMessenger' => View\Helper\SystemMessenger::class,
+            ],
+            'factories' => [
+                View\Helper\SystemMessenger::class => View\Helper\SystemMessengerFactory::class,
             ],
         ];
     }

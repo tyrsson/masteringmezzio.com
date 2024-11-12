@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use Message\SystemMessage;
+
 $this->headTitle($this->appName)->setSeparator(' - ')->setAutoEscape(false)
 ?>
 <?=$this->headTitle($this->title);?>
@@ -70,4 +72,5 @@ $this->headTitle($this->appName)->setSeparator(' - ')->setAutoEscape(false)
             ?>
         </ul>
     </nav>
+    <?=$this->systemMessage(SystemMessage::SYSTEM_MESSAGE_KEY)?>
 </header>

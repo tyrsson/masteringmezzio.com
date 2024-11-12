@@ -7,7 +7,7 @@ namespace Message;
 use Laminas\EventManager\Event;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class SystemMessage extends Event implements SystemMessageCapableInterface
+class SystemMessage extends Event implements SystemMessageCapableInterface
 {
     public function setRequest(ServerRequestInterface $request): self
     {
@@ -20,9 +20,6 @@ final class SystemMessage extends Event implements SystemMessageCapableInterface
         return $this->getParam('request');
     }
 
-    /**
-     * Set the $key to be used by the SystemMessenger for storing this $message
-     */
     public function setSystemMessageKey(string $systemMessageKey): self
     {
         $this->setParam('systemMessageKey', $systemMessageKey);
@@ -34,9 +31,6 @@ final class SystemMessage extends Event implements SystemMessageCapableInterface
         return $this->getParam('systemMessageKey', self::SYSTEM_MESSAGE_KEY);
     }
 
-    /**
-     * Set the systemMessage $message
-     */
     public function setSystemMessage(string $systemMessage): self
     {
         $this->setParam(self::SYSTEM_MESSAGE_KEY, $systemMessage);
@@ -48,9 +42,6 @@ final class SystemMessage extends Event implements SystemMessageCapableInterface
         return $this->getParam(self::SYSTEM_MESSAGE_KEY);
     }
 
-    /**
-     * Number of hops the systemMessage will be available for in the session
-     */
     public function setHops(int $hops = 1): self
     {
         $this->setParam('hops', $hops);
@@ -62,9 +53,6 @@ final class SystemMessage extends Event implements SystemMessageCapableInterface
         return $this->getParam('hops', 1);
     }
 
-    /**
-     * Flag systemMessage as accessible in current request
-     */
     public function setNow(bool $now = true): self
     {
         $this->setParam('now', $now);

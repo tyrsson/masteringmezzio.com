@@ -26,7 +26,6 @@ final class MessageListener extends AbstractListenerAggregate
 
     public function attach(EventManagerInterface $events, $priority = 1)
     {
-        //$this->listeners[] = $events->attach(Message::Email->value, [$this, 'onEmailMessage'], $priority);
         $this->listeners[] = $events->attach(
             SystemMessage::EVENT_SYSTEM_MESSAGE,
             [$this, 'onSystemMessage'],

@@ -8,7 +8,10 @@ use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\SharedEventManager;
 use Message\MessageListener;
+use Message\View\Helper\SystemMessenger;
 use Psr\Container\ContainerInterface;
+use Laminas\View\HelperPluginManager;
+
 
 final class MessageMiddlewareFactory
 {
@@ -19,9 +22,12 @@ final class MessageMiddlewareFactory
                         ? $container->get(EventManagerInterface::class)
                         : new EventManager(new SharedEventManager());
 
+        $helperManager = $container->get(HelperPluginManager::class);
+
         return new MessageMiddleware(
             $eventManager,
-            $container->get(MessageListener::class)
+            $container->get(MessageListener::class),
+            $helperManager->get(SystemMessenger::class)
         );
     }
 }

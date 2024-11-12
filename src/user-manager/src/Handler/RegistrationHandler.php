@@ -15,7 +15,7 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use UserManager\Message\Event\VerificationEmail;
+use UserManager\Message\VerificationEmail;
 use UserManager\Form\Register;
 use UserManager\User\UserRepository;
 
@@ -65,7 +65,7 @@ class RegistrationHandler implements RequestHandlerInterface
                 $result     = $this->userRepositoryInterface->save($userEntity, 'id');
                 // set event target
                 $email->setTarget($result);
-                $sendResult = $eventManager->triggerEvent($email);
+                $messageResult = $eventManager->triggerEvent($email);
             } catch (\Throwable $th) {
                 throw $th;
             }

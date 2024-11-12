@@ -42,12 +42,24 @@ final class MessageListener extends AbstractListenerAggregate
 
         $this->listeners[] = $events->attach(
             Message\VerificationEmail::EVENT_VERIFY_ACCOUNT_EMAIL,
-            [$this, 'onNotifyEmailSent'],
+            [$this, 'onNotifyVerifyEmailSent'],
+            0
+        );
+
+        $this->listeners[] = $events->attach(
+            Message\PasswordResetEmail::EVENT_PASSWORD_RESET_EMAIL,
+            [$this, 'onPasswordResetEmail'],
+            $priority
+        );
+
+        $this->listeners[] = $events->attach(
+            Message\PasswordResetEmail::EVENT_PASSWORD_RESET_EMAIL,
+            [$this, 'onNotifyPasswordResetEmailSent'],
             0
         );
     }
 
-    /** listener method that will actually send the email */
+    /** Account Verification Email */
     public function onVerifyAccountEmail(Message\VerificationEmail $e)
     {
         $target = $e->getTarget();
@@ -81,7 +93,7 @@ final class MessageListener extends AbstractListenerAggregate
             )
         );
         try {
-            $status = $this->mailer?->send($adapter);
+            $status = $this->mailer->send($adapter);
             if ($status && ! $e->getNotify()) {
                 $e->stopPropagation();
             }
@@ -91,16 +103,68 @@ final class MessageListener extends AbstractListenerAggregate
         }
     }
 
-    public function onNotifyEmailSent(Message\VerificationEmail $e)
+    /** Password Reset Email */
+    public function onPasswordResetEmail(Message\PasswordResetEmail $e)
+    {
+        $adapter    = $this->mailer->getAdapter();
+        $mailConfig = $this->config[MailConfigProvider::class][AdapterInterface::class] ?? null;
+        $target     = $e->getTarget();
+        $adapter?->to(
+            $target->email,
+            $target->firstName . ' ' . $target->lastName
+        );
+        $adapter?->isHtml();
+        $adapter?->subject(
+            sprintf(
+                $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_SUBJECT],
+                $this->config['app_settings']['app_name']
+            )
+        );
+        $adapter?->body(
+            sprintf(
+                $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_MESSAGE_BODY],
+                $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN],
+                $e->getParam('host'), // host
+                $this->urlHelper->generate(
+                    routeName: 'Change Password',
+                    routeParams: [
+                        'id'    => $target->id,
+                        'token' => $target->passwordResetToken,
+                    ],
+                    options: ['reuse_query_params' => false]
+                )
+            )
+        );
+        try {
+            $status = $this->mailer->send($adapter);
+            if ($status && ! $e->getNotify()) {
+                $e->stopPropagation();
+            }
+            return $status;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function onNotifyVerifyEmailSent(Message\VerificationEmail $e)
     {
         if ($e->getNotify()) {
-            //$systemMessage = new SystemMessage(SystemMessage::EVENT_SYSTEM_MESSAGE);
-            //$e->setTarget($e->getTarget());
-            //$e->setParams($e->getParams());
             $e->setName($e::EVENT_SYSTEM_MESSAGE);
             $e->setSystemMessage($e::SYSTEM_MESSAGE ?? static::NOTIFY_MESSAGE);
-            $e->setSystemMessageKey(Message\VerificationEmail::EVENT_VERIFY_ACCOUNT_EMAIL);
-            $result = $this->events->triggerEvent($e);
+            return $this->events->triggerEvent($e);
         }
+
+        return false;
+    }
+
+    public function onNotifyPasswordResetEmailSent(Message\PasswordResetEmail $e)
+    {
+        if ($e->getNotify()) {
+            $e->setName($e::EVENT_SYSTEM_MESSAGE);
+            $e->setSystemMessage($e::SYSTEM_MESSAGE ?? static::NOTIFY_MESSAGE);
+            return $this->events->triggerEvent($e);
+        }
+
+        return false;
     }
 }
