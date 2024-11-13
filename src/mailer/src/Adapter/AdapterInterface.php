@@ -15,4 +15,5 @@ interface AdapterInterface
     public function bcc(string $email);
     public function isHtml(bool $flag = true);
     public function isSmtp(bool $flag = false);
+    //public function send();
 }

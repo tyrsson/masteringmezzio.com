@@ -5,31 +5,26 @@ declare(strict_types=1);
 namespace UserManager\Handler;
 
 use App\HandlerTrait;
-use App\SystemMessageInterface;
-use Axleus\Db\EntityInterface;
 use Htmx\HtmxHandlerTrait;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\EventManager\EventManagerInterface;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\Exception\DomainException;
 use Laminas\View\Model\ModelInterface;
-use Mailer\Adapter\AdapterInterface;
-use Mailer\ConfigProvider as MailConfigProvider;
-use Mailer\Adapter\PhpMailer;
-use Mailer\Mailer;
-use Mailer\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Flash\Exception\InvalidHopsValueException;
-use Mezzio\Flash\FlashMessages;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
-use UserManager\ConfigProvider;
 use UserManager\Form\ResetPassword;
 use UserManager\Helper\VerificationHelper;
-use UserManager\UserRepository\TableGateway;
+use UserManager\Message\PasswordResetEmail;
+use UserManager\User\UserEntity;
+use UserManager\User\UserRepository;
 
 class ResetPasswordHandler implements RequestHandlerInterface
 {
@@ -40,7 +35,7 @@ class ResetPasswordHandler implements RequestHandlerInterface
 
     public function __construct(
         private TemplateRendererInterface $renderer,
-        private UserRepositoryInterface&TableGateway $userRepositoryInterface,
+        private UserRepositoryInterface&UserRepository $userRepositoryInterface,
         private UrlHelper $url,
         private VerificationHelper $verifyHelper,
         private ResetPassword $form,
@@ -75,57 +70,29 @@ class ResetPasswordHandler implements RequestHandlerInterface
         $body = $request->getParsedBody();
         $this->form->setData($body);
         if ($this->form->isValid()) {
-            $userEntity = $this->form->getData();
-            $uri = $request->getUri();
-            $host = $uri->getScheme() . '://' . $uri->getHost();
+            $userEntity   = $this->form->getData();
+            $eventManager = $request->getAttribute(EventManagerInterface::class);
+            $email        = new PasswordResetEmail(PasswordResetEmail::EVENT_PASSWORD_RESET_EMAIL);
+            $email->setNotify(true);
+            $uri   = $request->getUri();
+            $host  = $uri->getScheme() . '://' . $uri->getHost();
             $host .= $uri->getPort() !== null ? ':' . $uri->getPort() : '';
+            $email->setParam('host', $host);
             try {
                 /** @var UserEntity */
                 $result = $this->userRepositoryInterface->findOneBy('email', $userEntity->email);
                 $result->setPasswordResetToken($userEntity->getPasswordResetToken());
                 $result = $this->userRepositoryInterface->save($result, 'id');
-                /** @var Mailer */
-                $mailer = $request->getAttribute(MailerInterface::class);
-                /** @var PhpMailer */
-                $adapter = $mailer->getAdapter();
-                $mailConfig = $this->config[MailConfigProvider::class][AdapterInterface::class] ?? null;
-                $adapter?->to(
-                    $result->email,
-                    $result->firstName . ' ' . $result->lastName
-                );
-                $adapter?->isHtml();
-                $adapter?->subject(
-                    sprintf(
-                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_SUBJECT],
-                        $this->config['app_settings']['app_name']
-                    )
-                );
-                $adapter?->body(
-                    sprintf(
-                        $mailConfig[ConfigProvider::MAIL_MESSAGE_TEMPLATES][ConfigProvider::MAIL_RESET_PASSWORD_MESSAGE_BODY],
-                        $this->config['app_settings'][ConfigProvider::TOKEN_KEY][VerificationHelper::PASSWORD_RESET_TOKEN],
-                        $host, // host
-                        $this->url->generate(
-                            routeName: 'Change Password',
-                            routeParams: [
-                                'id'    => $result->id,
-                                'token' => $result->passwordResetToken,
-                            ],
-                            options: ['reuse_query_params' => false]
-                        )
-                    )
-                );
-                $mailer?->send($adapter);
+                $email->setTarget($result);
+                $messageResult = $eventManager->triggerEvent($email);
             } catch (\Throwable $th) {
                 throw $th;
             }
+            return new RedirectResponse(
+                $this->url->generate('Home')
+            );
         }
-        /** @var FlashMessages */
-        $messenger = $request->getAttribute(SystemMessageInterface::class);
-        $messenger->flash(
-            static::MESSAGE_KEY,
-            'If the requested email address was found a reset email will be sent to that account.'
-        );
+
         $model = $request->getAttribute(ModelInterface::class);
         return new HtmlResponse(
             html: $this->renderer->render(

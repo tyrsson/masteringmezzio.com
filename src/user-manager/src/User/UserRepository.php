@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace UserManager\UserRepository;
+namespace UserManager\User;
 
 use Axleus\Db;
 use Axleus\Db\EntityInterface;
+use Laminas\Db\ResultSet\AbstractResultSet; // do not remove
 use Laminas\Db\Sql\Select;
 use Laminas\Db\Sql\Where;
 use Mezzio\Authentication\Exception;
@@ -15,7 +16,7 @@ use Webmozart\Assert\Assert;
 
 use function password_verify;
 
-final class TableGateway extends Db\AbstractRepository implements UserRepositoryInterface
+final class UserRepository extends Db\AbstractRepository implements UserRepositoryInterface
 {
     /**
      * @var callable
@@ -50,8 +51,9 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
         $where->equalTo($this->config['username'], $credential);
         $where->isNotNull('verified');
         $select->where($where);
-        /** @var App\UserRepository\UserEntity */
-        $user = $this->gateway->selectWith($select)->current();
+        /** @var ResultSetInterface */
+        $resultSet = $this->gateway->selectWith($select);
+        $user = $resultSet->current();
         $hash = $user->getPassword();
         $this->checkBcryptHash($hash);
         if (password_verify($password, $hash)) {
@@ -70,10 +72,10 @@ final class TableGateway extends Db\AbstractRepository implements UserRepository
         $where = new Where();
         $where->equalTo($column, $value);
         $select->where($where);
-        /** @var App\UserRepository\UserEntity */
-        $user = $this->gateway->selectWith($select)->current();
+        /** @var ResultSetInterface */
+        $resultSet = $this->gateway->selectWith($select);
         // todo: add exception handling
-        return $user;
+        return $resultSet->current();
     }
 
     /**

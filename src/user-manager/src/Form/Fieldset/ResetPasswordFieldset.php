@@ -12,7 +12,7 @@ use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Hydrator\ArraySerializableHydrator;
 use Laminas\Validator;
-use UserManager\UserRepository\UserEntity;
+use UserManager\User\UserEntity;
 use Webinertia\Filter\Uuid;
 
 final class ResetPasswordFieldset extends Fieldset implements AdapterAwareInterface, InputFilterProviderInterface

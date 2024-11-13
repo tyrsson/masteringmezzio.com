@@ -9,7 +9,7 @@ use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Hydrator\ArraySerializableHydrator;
 use UserManager\InputFilter\AcctDataFilter;
-use UserManager\UserRepository\UserEntity;
+use UserManager\User\UserEntity;
 
 final class AcctDataFieldset extends Fieldset implements InputFilterProviderInterface
 {

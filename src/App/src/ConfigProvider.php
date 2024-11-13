@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Fig\Http\Message\RequestMethodInterface as Http;
-use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-use Psr\Container\ContainerInterface;
 
 /**
  * The configuration provider for the App module
@@ -95,7 +93,6 @@ class ConfigProvider
             'factories'  => [
                 Tooling\CreateCrudHandlerCommand::class => Tooling\CreateCrudHandlerCommandFactory::class,
                 Tooling\CreateRouteCommand::class       => Tooling\CreateRouteCommandFactory::class,
-                FlashMessageMiddleware::class           => Container\FlashMessageMiddlewareFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,
                 Middleware\AjaxRequestMiddleware::class => Middleware\AjaxRequestMiddlewareFactory::class,

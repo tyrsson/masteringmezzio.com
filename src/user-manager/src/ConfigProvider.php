@@ -18,7 +18,7 @@ use Mezzio\Authorization\AuthorizationInterface;
 use Mezzio\Authorization\AuthorizationMiddleware;
 use Mezzio\Authorization\Rbac\LaminasRbacAssertionInterface;
 use Mezzio\Helper\BodyParams\BodyParamsMiddleware;
-use Webinertia\Validator\Password;
+use Webinertia\Validator\PasswordRequirement;
 
 final class ConfigProvider
 {
@@ -42,6 +42,7 @@ final class ConfigProvider
             'filters'                   => $this->getFilters(),
             'form_elements'             => $this->getFormElementConfig(),
             'input_filters'             => $this->getInputFilterConfig(),
+            'message_listeners'         => $this->getMessageListenerConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'routes'                    => $this->getRouteConfig(),
             'templates'                 => $this->getTemplates(),
@@ -63,7 +64,7 @@ final class ConfigProvider
                 'verificationToken'   => '1 Hour',
                 'passwordResetToken'  => '1 Hour',
             ],
-            Password::class => [
+            PasswordRequirement::class => [
                 'options' => [
                     'length'  => 8, // overall length of password
                     'upper'   => 1, // uppercase count
@@ -97,11 +98,11 @@ final class ConfigProvider
             'permissions' => [
                 'Guest' => [
                     'Home',
+                    'Change Password',
                     'Login',
                     'Register',
                     'Reset Password',
                     'Verify Account',
-                    'Change Password',
                 ],
                 'User'  => [
                     'Logout',
@@ -120,7 +121,7 @@ final class ConfigProvider
                 AuthenticationInterface::class       => PhpSession::class,
                 AuthorizationInterface::class        => Authz\Rbac::class,
                 LaminasRbacAssertionInterface::class => Authz\UserAssertion::class,
-                UserRepositoryInterface::class       => UserRepository\TableGateway::class,
+                UserRepositoryInterface::class       => User\UserRepository::class,
             ],
             'delegators' => [
                 Application::class => [
@@ -128,18 +129,20 @@ final class ConfigProvider
                 ],
             ],
             'factories'  => [
-                Authz\Rbac::class                    => Authz\RbacFactory::class,
-                Authz\UserAssertion::class           => InvokableFactory::class,
-                Handler\AccountHandler::class        => Handler\AccountHandlerFactory::class,
-                Handler\ChangePasswordHandler::class => Handler\ChangePasswordHandlerFactory::class,
-                Handler\LoginHandler::class          => Handler\LoginHandlerFactory::class,
-                Handler\LogoutHandler::class         => Handler\LogoutHandlerFactory::class,
-                Handler\RegistrationHandler::class   => Handler\RegistrationHandlerFactory::class,
-                Handler\ResetPasswordHandler::class  => Handler\ResetPasswordHandlerFactory::class,
-                Handler\VerifyAccountHandler::class  => Handler\VerifyAccountHandlerFactory::class,
-                Helper\VerificationHelper::class     => Helper\VerificationHelperFactory::class,
-                Middleware\IdentityMiddleware::class => Middleware\IdentityMiddlewareFactory::class,
-                UserRepository\TableGateway::class   => UserRepository\TableGatewayFactory::class,
+                AuthorizationMiddleware::class           => Middleware\AuthorizationMiddlewareFactory::class,
+                Authz\Rbac::class                        => Authz\RbacFactory::class,
+                Authz\UserAssertion::class               => InvokableFactory::class,
+                Handler\AccountHandler::class            => Handler\AccountHandlerFactory::class,
+                Handler\ChangePasswordHandler::class     => Handler\ChangePasswordHandlerFactory::class,
+                Handler\LoginHandler::class              => Handler\LoginHandlerFactory::class,
+                Handler\LogoutHandler::class             => Handler\LogoutHandlerFactory::class,
+                Handler\RegistrationHandler::class       => Handler\RegistrationHandlerFactory::class,
+                Handler\ResetPasswordHandler::class      => Handler\ResetPasswordHandlerFactory::class,
+                Handler\VerifyAccountHandler::class      => Handler\VerifyAccountHandlerFactory::class,
+                Helper\VerificationHelper::class         => Helper\VerificationHelperFactory::class,
+                Message\Listener\MessageListener::class  => Message\Listener\MessageListenerFactory::class,
+                Middleware\IdentityMiddleware::class     => Middleware\IdentityMiddlewareFactory::class,
+                User\UserRepository::class               => User\UserRepositoryFactory::class,
             ],
         ];
     }
@@ -157,13 +160,16 @@ final class ConfigProvider
     {
         return [
             'factories' => [
-                Form\Fieldset\AcctDataFieldset::class      => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
-                Form\Fieldset\ResendVerification::class    => InvokableFactory::class,
-                Form\Login::class                          => Form\LoginFactory::class,
-                Form\Register::class                       => Form\RegisterFactory::class,
-                Form\ResendVerification::class             => Form\ResendVerificationFactory::class,
-                Form\ResetPassword::class                  => Form\ResetPasswordFactory::class,
-                Form\Fieldset\ResetPasswordFieldset::class => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
+                Form\Fieldset\AcctDataFieldset::class       => Form\Fieldset\Factory\AcctDataFieldsetFactory::class,
+                Form\Fieldset\ChangePasswordFieldset::class => Form\Fieldset\Factory\PasswordFieldsetFactory::class,
+                Form\Fieldset\PasswordFieldset::class       => Form\Fieldset\Factory\PasswordFieldsetFactory::class,
+                Form\Fieldset\ResendVerification::class     => InvokableFactory::class,
+                Form\ChangePassword::class                  => Form\ChangePasswordFactory::class,
+                Form\Login::class                           => Form\LoginFactory::class,
+                Form\Register::class                        => Form\RegisterFactory::class,
+                Form\ResendVerification::class              => Form\ResendVerificationFactory::class,
+                Form\ResetPassword::class                   => Form\ResetPasswordFactory::class,
+                Form\Fieldset\ResetPasswordFieldset::class  => Form\Fieldset\Factory\ResetPasswordFieldsetFactory::class,
             ],
         ];
     }
@@ -188,6 +194,16 @@ final class ConfigProvider
                     static::MAIL_RESET_PASSWORD_MESSAGE_BODY => 'The reset link in this email is valid for %s. Please <a href="%s%s">Click Here!!</a> to reset your password.'
                 ],
             ],
+        ];
+    }
+
+    public function getMessageListenerConfig(): array
+    {
+        return [
+            [
+                'listener' => Message\Listener\MessageListener::class,
+                //'priority' => 0,
+            ]
         ];
     }
 

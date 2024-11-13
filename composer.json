@@ -84,7 +84,8 @@
             "Htmx\\": "src/htmx/src",
             "UserManager\\": "src/user-manager/src/",
             "Pico\\": "src/pico/src/",
-            "Mailer\\": "src/mailer/src/"
+            "Mailer\\": "src/mailer/src/",
+            "Message\\": "src/Message/src/"
         }
     },
     "autoload-dev": {

@@ -9,12 +9,14 @@ use Laminas\Filter\StripTags;
 use Laminas\Form\Element\Password;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\Fieldset;
+use Laminas\Hydrator\ArraySerializableHydrator;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator\Identical;
 use Laminas\Validator\StringLength;
-use Webinertia\Validator\Password as PasswordValidator;
+use UserManager\User\UserEntity;
+use Webinertia\Validator\PasswordRequirement;
 
-final class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
+class PasswordFieldset extends Fieldset implements InputFilterProviderInterface
 {
     /**
      * @param mixed $name
@@ -22,37 +24,39 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
      * @return void
      * @throws InvalidArgumentException
      */
-    public function __construct(array $config, $name = 'acct-data', $options = [])
+    public function __construct($name = 'acct-data', $options = [])
     {
         parent::__construct($name, $options);
     }
 
     public function init(): void
     {
-
+        $this->setObject(new UserEntity());
+        $this->setHydrator(new ArraySerializableHydrator());
         $this->add([
-            'name'    => 'password',
-            'type'    => Password::class,
-            'options' => [
-                'label' => 'Password',
+            'name'       => 'password',
+            'type'       => Password::class,
+            'attributes' => [
+                'placeholder' => 'Password',
             ],
         ]);
         $this->add([
-            'name'    => 'conf_password',
-            'type'    => Password::class,
-            'options' => [
-                'label' => 'Confirm Password',
+            'name'       => 'conf_password',
+            'type'       => Password::class,
+            'attributes' => [
+                'placeholder' => 'Confirm Password',
             ],
         ]);
     }
 
     public function getInputFilterSpecification(): array
     {
+        $options = $this->getOptions();
         return [
             [
-                'name'       => 'password',
-                'required'   => true,
-                'filters'    => [
+                'name'     => 'password',
+                'required' => true,
+                'filters'  => [
                     ['name' => StripTags::class],
                     ['name' => StringTrim::class],
                 ],
@@ -66,21 +70,15 @@ final class PasswordFieldset extends Fieldset implements InputFilterProviderInte
                         ],
                     ],
                     [
-                        'name' => PasswordValidator::class,
-                        'options' => [
-                            'length'  => 8, // overall length of password
-                            'upper'   => 1, // uppercase count
-                            'lower'   => 2, // lowercase count
-                            'digit'   => 2, // digit count
-                            'special' => 2, // special char count
-                        ],
+                        'name'    => PasswordRequirement::class,
+                        'options' => $options['password_options'],
                     ],
                 ],
             ],
             [
-                'name'       => 'conf_password',
-                'required'   => true,
-                'filters'    => [
+                'name'     => 'conf_password',
+                'required' => true,
+                'filters'  => [
                     ['name' => StripTags::class],
                     ['name' => StringTrim::class],
                 ],
