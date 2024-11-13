@@ -5,28 +5,21 @@ declare(strict_types=1);
 namespace UserManager\Handler;
 
 use App\HandlerTrait;
-use App\SystemMessageInterface;
 use Htmx\HtmxHandlerTrait;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Form\Exception\InvalidArgumentException;
 use Laminas\Form\Exception\DomainException;
 use Laminas\View\Model\ModelInterface;
-use Mailer\Adapter\AdapterInterface;
-use Mailer\ConfigProvider as MailConfigProvider;
-use Mailer\Adapter\PhpMailer;
-use Mailer\Mailer;
-use Mailer\MailerInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use Mezzio\Flash\Exception\InvalidHopsValueException;
-use Mezzio\Flash\FlashMessages;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Throwable;
-use UserManager\ConfigProvider;
 use UserManager\Form\ResetPassword;
 use UserManager\Helper\VerificationHelper;
 use UserManager\Message\PasswordResetEmail;
@@ -95,6 +88,9 @@ class ResetPasswordHandler implements RequestHandlerInterface
             } catch (\Throwable $th) {
                 throw $th;
             }
+            return new RedirectResponse(
+                $this->url->generate('Home')
+            );
         }
 
         $model = $request->getAttribute(ModelInterface::class);
