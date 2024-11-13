@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Message;
 
 use Laminas\EventManager\Event;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class SystemMessage extends Event implements SystemMessageCapableInterface
@@ -18,6 +19,17 @@ class SystemMessage extends Event implements SystemMessageCapableInterface
     public function getRequest(): ?ServerRequestInterface
     {
         return $this->getParam('request');
+    }
+
+    public function setResponse(ResponseInterface $response): self
+    {
+        $this->setParam('response', $response);
+        return $this;
+    }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->getParam('response');
     }
 
     public function setSystemMessageKey(string $systemMessageKey): self
