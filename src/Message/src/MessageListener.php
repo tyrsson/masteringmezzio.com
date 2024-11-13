@@ -9,8 +9,6 @@ use Laminas\EventManager\EventManagerInterface;
 use Mailer\MailerInterface;
 use Mezzio\Helper\UrlHelper;
 
-use function sprintf;
-
 final class MessageListener extends AbstractListenerAggregate
 {
     private const DEFAULT_MESSAGE = 'The requested action was performed';
