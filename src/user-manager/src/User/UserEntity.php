@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace UserManager\User;
 
 use ArrayObject;
-use Axleus\Db;
+use Db;
 use Mezzio\Authentication\UserInterface;
 use Ramsey\Uuid\Lazy\LazyUuidFromString;
 use Webinertia\Filter\PasswordHash;
