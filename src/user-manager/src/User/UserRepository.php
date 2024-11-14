@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\User;
 
-use Axleus\Db;
-use Axleus\Db\EntityInterface;
+use Db;
 use Laminas\Db\ResultSet\AbstractResultSet; // do not remove
 use Laminas\Db\Sql\Select;
 use Laminas\Db\Sql\Where;
@@ -66,7 +65,7 @@ final class UserRepository extends Db\AbstractRepository implements UserReposito
         return null;
     }
 
-    public function findOneBy(string $column, mixed $value, ?array $columns = [Select::SQL_STAR], ?array $joins = null): ?EntityInterface
+    public function findOneBy(string $column, mixed $value, ?array $columns = [Select::SQL_STAR], ?array $joins = null): ?DB\EntityInterface
     {
         $select = $this->gateway->getSql()->select();
         $where = new Where();

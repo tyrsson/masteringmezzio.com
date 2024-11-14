@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace UserManager\User;
 
-use Axleus\Db;
+use Db;
 use Laminas\Db\Adapter\AdapterInterface;
 use Laminas\Db\ResultSet\HydratingResultSet;
 use Laminas\Hydrator\ArraySerializableHydrator;

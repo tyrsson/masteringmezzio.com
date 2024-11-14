@@ -43,7 +43,7 @@
     },
     "require": {
         "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
-        "axleus/axleus-db": "1.0.x-dev",
+        "axleus/db": "dev-master",
         "composer/package-versions-deprecated": "^1.10.99",
         "laminas/laminas-component-installer": "^2.6 || ^3.0",
         "laminas/laminas-config": "^3.9",
@@ -57,15 +57,13 @@
         "mezzio/mezzio-authentication-session": "^1.9",
         "mezzio/mezzio-authorization-rbac": "^1.7",
         "mezzio/mezzio-fastroute": "^3.11.0",
-        "mezzio/mezzio-flash": "^1.8",
-        "mezzio/mezzio-helpers": "^5.7",
         "mezzio/mezzio-laminasviewrenderer": "^2.15",
         "mezzio/mezzio-session-ext": "^1.19",
         "phpmailer/phpmailer": "^6.9",
         "psr/clock": "^1.0",
         "ramsey/uuid": "^4.7",
         "webinertia/webinertia-filter": "^0.0.5",
-        "webinertia/webinertia-validator": "^0.0.4"
+        "webinertia/webinertia-validator": "dev-master"
     },
     "require-dev": {
         "filp/whoops": "^2.15.4",
