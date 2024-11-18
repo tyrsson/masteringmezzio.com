@@ -24,10 +24,10 @@ class HomePageHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $data  = [];
-        $model = $request->getAttribute(ModelInterface::class);
-        $model->setVariables($data);
+        // $model = $request->getAttribute(ModelInterface::class);
+        // $model->setVariables($data);
         return new HtmlResponse(
-            $this->template->render('app::home-page', $model)
+            $this->template->render('app::home-page', $data)
         );
     }
 }

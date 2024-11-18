@@ -25,13 +25,12 @@ class ConfigProvider
     {
         return [
             'dependencies'              => $this->getDependencies(),
-            'laminas-cli'               => $this->getConsoleConfig(),
             'mezzio-authorization-rbac' => $this->getAuthorizationConfig(),
             'templates'                 => $this->getTemplates(),
             'routes'                    => $this->getRoutes(),
             static::APP_SETTINGS_KEY    => $this->getAppSettings(),
-            \UserManager\ConfigProvider::class => [
-                \UserManager\ConfigProvider::RBAC_MAPPED_ROUTES => $this->getRbacMappedRoutes(),
+            \Axleus\UserManager\ConfigProvider::class => [
+                \Axleus\UserManager\ConfigProvider::RBAC_MAPPED_ROUTES => $this->getRbacMappedRoutes(),
             ]
         ];
     }
@@ -64,16 +63,6 @@ class ConfigProvider
         ];
     }
 
-    public function getConsoleConfig(): array
-    {
-        return [
-            'commands' => [
-                'mezzio:handler:crud' => Tooling\CreateCrudHandlerCommand::class,
-                'mezzio:route:create' => Tooling\CreateRouteCommand::class,
-            ],
-        ];
-    }
-
     public function getRbacMappedRoutes(): array
     {
         return [
@@ -91,8 +80,6 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories'  => [
-                Tooling\CreateCrudHandlerCommand::class => Tooling\CreateCrudHandlerCommandFactory::class,
-                Tooling\CreateRouteCommand::class       => Tooling\CreateRouteCommandFactory::class,
                 Handler\DashboardHandler::class         => Handler\DashboardHandlerFactory::class,
                 Handler\HomePageHandler::class          => Handler\HomePageHandlerFactory::class,
                 Middleware\AjaxRequestMiddleware::class => Middleware\AjaxRequestMiddlewareFactory::class,

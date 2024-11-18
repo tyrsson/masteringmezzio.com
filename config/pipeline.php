@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Middleware\AjaxRequestMiddleware;
 use App\Middleware\TemplateMiddleware;
-use Htmx\Middleware\HtmxMiddleware;
-use Laminas\Stratigility\Middleware\ErrorHandler;
-use Message\Middleware\MessageMiddleware;
+use Axleus\Htmx\Middleware\HtmxMiddleware;
+use Axleus\Message\Middleware\MessageMiddleware;
+use Axleus\UserManager\Middleware\IdentityMiddleware;
 use Mezzio\Application;
+use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Authorization\AuthorizationMiddleware;
-use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Handler\NotFoundHandler;
 use Mezzio\Helper\ServerUrlMiddleware;
 use Mezzio\Helper\UrlHelperMiddleware;
@@ -21,7 +21,7 @@ use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Mezzio\Session\SessionMiddleware;
 use Psr\Container\ContainerInterface;
-use UserManager\Middleware\IdentityMiddleware;
+
 
 /**
  * Setup middleware pipeline:

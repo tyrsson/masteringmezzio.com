@@ -1,0 +1,14 @@
+<?php
+declare(strict_types=1);
+?>
+<?php
+    if (isset($this->title)) {
+        $this->headTitle($this->title);
+    }
+?>
+<?=$this->header?>
+<main id="app-main" class="container">
+    <?=$this->content?>
+</main>
+<?=$this->footer?>
+<?=$this->inlineScript()?>

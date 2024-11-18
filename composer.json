@@ -43,7 +43,13 @@
     },
     "require": {
         "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
-        "axleus/db": "dev-master",
+        "axleus/axleus-core": "dev-master",
+        "axleus/axleus-db": "dev-master",
+        "axleus/axleus-filter": "dev-master",
+        "axleus/axleus-htmx": "dev-master",
+        "axleus/axleus-pico": "dev-master",
+        "axleus/axleus-usermanager": "dev-master",
+        "axleus/axleus-validator": "dev-master",
         "composer/package-versions-deprecated": "^1.10.99",
         "laminas/laminas-component-installer": "^2.6 || ^3.0",
         "laminas/laminas-config": "^3.9",
@@ -54,18 +60,12 @@
         "laminas/laminas-servicemanager": "^3.22",
         "laminas/laminas-stdlib": "^3.6",
         "mezzio/mezzio": "^3.7",
-        "mezzio/mezzio-authentication-session": "^1.9",
-        "mezzio/mezzio-authorization-rbac": "^1.7",
-        "mezzio/mezzio-fastroute": "^3.11.0",
-        "mezzio/mezzio-laminasviewrenderer": "^2.15",
-        "mezzio/mezzio-session-ext": "^1.19",
-        "phpmailer/phpmailer": "^6.9",
-        "psr/clock": "^1.0",
-        "ramsey/uuid": "^4.7",
-        "webinertia/webinertia-filter": "^0.0.5",
-        "webinertia/webinertia-validator": "dev-master"
+        "mezzio/mezzio-fastroute": "^3.12",
+        "mezzio/mezzio-session-ext": "^1.20"
     },
     "require-dev": {
+        "axleus/axleus-debug": "dev-master",
+        "axleus/axleus-tooling": "dev-master",
         "filp/whoops": "^2.15.4",
         "laminas/laminas-coding-standard": "~2.5.0",
         "laminas/laminas-development-mode": "^3.12.0",
@@ -77,13 +77,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/App/src/",
-            "Debug\\": "src/debug/src/",
-            "Htmx\\": "src/htmx/src",
-            "UserManager\\": "src/user-manager/src/",
-            "Pico\\": "src/pico/src/",
-            "Mailer\\": "src/mailer/src/",
-            "Message\\": "src/Message/src/"
+            "App\\": "src/App/src/"
         }
     },
     "autoload-dev": {

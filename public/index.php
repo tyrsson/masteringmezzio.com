@@ -18,12 +18,12 @@ require 'vendor/autoload.php';
 (function () {
     $showDebug = false;
     $adapter   = null;
-    if (file_exists('config/development.config.php') && class_exists(\Debug\Debug::class)) {
+    if (file_exists('config/development.config.php') && class_exists(\Axleus\Debug\Debug::class)) {
         $debugConfig = require 'config/development.config.php';
 
         if ($debugConfig['debug']) {
             $showDebug = true;
-            \Debug\Debug::timer('total-runtime');
+            \Axleus\Debug\Debug::timer('total-runtime');
         }
     }
 
@@ -43,7 +43,7 @@ require 'vendor/autoload.php';
 
     $app->run();
     if ($showDebug) {
-        echo \Debug\Debug::timer('total-runtime');
-        echo \Debug\Debug::dbDebug($adapter);
+        echo \Axleus\Debug\Debug::timer('total-runtime');
+        echo \Axleus\Debug\Debug::dbDebug($adapter);
     }
 })();

@@ -37,6 +37,12 @@ $this->headScript()
     ],
 );
 
+$this->headScript()
+->appendScript(
+    'let dismissMessage = null',
+    'text/javascript',
+);
+
 // $this->headScript()->appendScript(
 //     "htmx.config = '$this->htmxConfig'",
 //     '',
@@ -64,5 +70,6 @@ $this->inlineScript()
     </head>
     <body hx-boost="true" hx-push-url="true">
         <?=$this->content?>
+        <?=$this->inlineScript()?>
     </body>
 </html>

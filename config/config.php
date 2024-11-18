@@ -13,9 +13,6 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
-
-    \Webinertia\Validator\ConfigProvider::class,
-    \Webinertia\Filter\ConfigProvider::class,
     \Mezzio\Tooling\ConfigProvider::class,
     \Mezzio\ConfigProvider::class,
     \Mezzio\Session\Ext\ConfigProvider::class,
@@ -36,24 +33,29 @@ $aggregator = new ConfigAggregator([
     \Laminas\InputFilter\ConfigProvider::class,
     \Laminas\Filter\ConfigProvider::class,
     \Laminas\Validator\ConfigProvider::class,
-    \Db\ConfigProvider::class,
     \Laminas\Db\ConfigProvider::class,
     // Include cache configuration
     new ArrayProvider($cacheConfig),
+    // load axleus
+    \Axleus\Core\ConfigProvider::class,
+    \Axleus\Db\ConfigProvider::class,
+    \Axleus\Filter\ConfigProvider::class,
 
-    \Mailer\ConfigProvider::class,
+    \Axleus\Mailer\ConfigProvider::class,
+    \Axleus\Message\ConfigProvider::class,
+    \Axleus\Pico\ConfigProvider::class,
+    \Axleus\Tooling\ConfigProvider::class,
+    \Axleus\UserManager\ConfigProvider::class,
+    \Axleus\Validator\ConfigProvider::class,
     // Default App module config
     App\ConfigProvider::class,
-    \Htmx\ConfigProvider::class,
-    \UserManager\ConfigProvider::class,
-    \Pico\ConfigProvider::class,
-    \Message\ConfigProvider::class,
 
+    \Axleus\Htmx\ConfigProvider::class,
     /**
      * If DevTools is present load the provider
      */
-    class_exists(\Debug\ConfigProvider::class)
-        ? \Debug\ConfigProvider::class
+    class_exists(\Axleus\Debug\ConfigProvider::class)
+        ? \Axleus\Debug\ConfigProvider::class
         : function(): array {
             return [];
         },

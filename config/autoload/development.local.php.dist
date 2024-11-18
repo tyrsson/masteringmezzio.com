@@ -14,8 +14,8 @@ declare(strict_types=1);
  * `composer development-enable`.
  */
 
-use Mailer\ConfigProvider;
-use Mailer\Adapter\AdapterInterface;
+use Axleus\Mailer\ConfigProvider;
+use Axleus\Mailer\Adapter\AdapterInterface;
 use Mezzio\Container;
 use Mezzio\Middleware\ErrorResponseGenerator;
 
